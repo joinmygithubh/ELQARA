@@ -1,28 +1,25 @@
-// client/src/services/currencyService.js
-import { currencyAPI } from './api';
+import { currencyAPI } from './api.js';
 
 export const SUPPORTED_CURRENCIES = [
   { code: 'INR', symbol: '₹', name: 'Indian Rupee', flag: '🇮🇳', decimals: 0, formatLocale: 'en-IN' },
   { code: 'USD', symbol: '$', name: 'US Dollar', flag: '🇺🇸', decimals: 2, formatLocale: 'en-US' },
-  { code: 'EUR', symbol: '€', name: 'Euro', flag: '🇪🇺', decimals: 2, formatLocale: 'de-DE' },
+  { code: 'EUR', symbol: '€', name: 'Euro', flag: '🇪🇺', decimals: 2, formatLocale: 'en-IE' },
   { code: 'GBP', symbol: '£', name: 'British Pound', flag: '🇬🇧', decimals: 2, formatLocale: 'en-GB' },
-  { code: 'AUD', symbol: 'A$', name: 'Australian Dollar', flag: '🇦🇺', decimals: 2, formatLocale: 'en-AU' },
   { code: 'CAD', symbol: 'C$', name: 'Canadian Dollar', flag: '🇨🇦', decimals: 2, formatLocale: 'en-CA' },
+  { code: 'AUD', symbol: 'A$', name: 'Australian Dollar', flag: '🇦🇺', decimals: 2, formatLocale: 'en-AU' },
   { code: 'AED', symbol: 'AED', name: 'UAE Dirham', flag: '🇦🇪', decimals: 2, formatLocale: 'en-AE' },
-  { code: 'SGD', symbol: 'S$', name: 'Singapore Dollar', flag: '🇸🇬', decimals: 2, formatLocale: 'en-SG' },
-  { code: 'JPY', symbol: '¥', name: 'Japanese Yen', flag: '🇯🇵', decimals: 0, formatLocale: 'ja-JP' },
+  { code: 'SAR', symbol: 'SAR', name: 'Saudi Riyal', flag: '🇸🇦', decimals: 2, formatLocale: 'en-SA' },
 ];
 
 export const DEFAULT_RATES = {
   INR: 1,
   USD: 0.0104,
   EUR: 0.0092,
-  GBP: 0.0079,
-  AUD: 0.0149,
+  GBP: 0.0078,
   CAD: 0.0148,
+  AUD: 0.0149,
   AED: 0.0381,
-  SGD: 0.0133,
-  JPY: 1.638
+  SAR: 0.0389
 };
 
 const STORAGE_KEYS = {
@@ -54,7 +51,7 @@ export const formatCurrency = (inrAmount, currencyCode = 'INR', rate = 1) => {
   const numericRate = Number(rate) || DEFAULT_RATES[code] || 1;
   const converted = code === 'INR' ? numericInr : numericInr * numericRate;
 
-  // Decide decimal places: JPY has 0, INR has 0 for whole numbers, others usually 2
+  // Decide decimal places: INR has 0 for integer prices, others standard 2
   let decimals = config.decimals;
   if (code === 'INR') {
     decimals = converted % 1 === 0 ? 0 : 2;
@@ -66,16 +63,15 @@ export const formatCurrency = (inrAmount, currencyCode = 'INR', rate = 1) => {
       maximumFractionDigits: decimals
     }).format(converted);
 
-    // Prepend symbol according to standards
-    if (code === 'AED') return `AED ${formattedNum}`;
+    // Explicit currency prefix according to luxury standards
+    if (code === 'INR') return `₹${formattedNum}`;
+    if (code === 'USD') return `$${formattedNum}`;
     if (code === 'EUR') return `€${formattedNum}`;
     if (code === 'GBP') return `£${formattedNum}`;
-    if (code === 'USD') return `$${formattedNum}`;
-    if (code === 'INR') return `₹${formattedNum}`;
-    if (code === 'JPY') return `¥${formattedNum}`;
-    if (code === 'AUD') return `A$${formattedNum}`;
     if (code === 'CAD') return `C$${formattedNum}`;
-    if (code === 'SGD') return `S$${formattedNum}`;
+    if (code === 'AUD') return `A$${formattedNum}`;
+    if (code === 'AED') return `AED ${formattedNum}`;
+    if (code === 'SAR') return `SAR ${formattedNum}`;
 
     return `${config.symbol}${formattedNum}`;
   } catch (err) {
@@ -94,27 +90,21 @@ export const convertInrToCurrency = (inrAmount, currencyCode = 'INR', rate = 1) 
   if (code === 'INR') return Number(inrAmount);
   const numericRate = Number(rate) || DEFAULT_RATES[code] || 1;
   const converted = Number(inrAmount) * numericRate;
-  return code === 'JPY' ? Math.round(converted) : Math.round(converted * 100) / 100;
+  return Math.round(converted * 100) / 100;
 };
 
 /**
- * Instant local guess based on browser timezone and language
+ * Instant initial guess based on previously auto-detected cache or timezone heuristic
  */
 export const guessInitialCurrency = () => {
   try {
-    // 1. Check if user already manually selected a currency in localStorage
-    const savedManual = localStorage.getItem(STORAGE_KEYS.MANUAL_SELECTION);
-    if (savedManual && SUPPORTED_CURRENCIES.some((c) => c.code === savedManual)) {
-      return savedManual;
-    }
-
-    // 2. Check previously auto-detected currency
+    // 1. Check previously auto-detected currency for zero layout shift
     const savedAuto = localStorage.getItem(STORAGE_KEYS.AUTO_DETECTED);
     if (savedAuto && SUPPORTED_CURRENCIES.some((c) => c.code === savedAuto)) {
       return savedAuto;
     }
 
-    // 3. Timezone heuristic
+    // 2. Pre-render timezone heuristic while API resolves
     const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
     if (timeZone.includes('Calcutta') || timeZone.includes('Kolkata') || timeZone.includes('India')) {
       return 'INR';
@@ -125,23 +115,20 @@ export const guessInitialCurrency = () => {
     if (timeZone.includes('London')) {
       return 'GBP';
     }
-    if (timeZone.includes('Paris') || timeZone.includes('Berlin') || timeZone.includes('Rome') || timeZone.includes('Madrid') || timeZone.includes('Amsterdam') || timeZone.includes('Vienna') || timeZone.includes('Dublin')) {
+    if (timeZone.includes('Paris') || timeZone.includes('Berlin') || timeZone.includes('Rome') || timeZone.includes('Madrid') || timeZone.includes('Amsterdam') || timeZone.includes('Vienna') || timeZone.includes('Dublin') || timeZone.includes('Brussels')) {
       return 'EUR';
-    }
-    if (timeZone.includes('Tokyo')) {
-      return 'JPY';
     }
     if (timeZone.includes('Dubai')) {
       return 'AED';
+    }
+    if (timeZone.includes('Riyadh')) {
+      return 'SAR';
     }
     if (timeZone.includes('Sydney') || timeZone.includes('Melbourne') || timeZone.includes('Brisbane')) {
       return 'AUD';
     }
     if (timeZone.includes('Toronto') || timeZone.includes('Vancouver') || timeZone.includes('Montreal')) {
       return 'CAD';
-    }
-    if (timeZone.includes('Singapore')) {
-      return 'SGD';
     }
   } catch (e) {
     // ignore
@@ -186,22 +173,28 @@ export const fetchRates = async () => {
 };
 
 /**
- * Detect visitor currency from backend API
+ * Automatically detect visitor currency from backend API based on country
  */
 export const detectVisitorCurrency = async () => {
-  // If user already made a manual choice, respect it 100%
-  const manual = localStorage.getItem(STORAGE_KEYS.MANUAL_SELECTION);
-  if (manual) {
-    return { currency: manual, isManual: true };
-  }
+  // Purge any old manual preference to guarantee pure automatic detection
+  try {
+    localStorage.removeItem(STORAGE_KEYS.MANUAL_SELECTION);
+  } catch {}
 
   try {
-    const res = await currencyAPI.detect();
+    let params;
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const testCountry = urlParams.get('country') || sessionStorage.getItem('elqara_test_country');
+      if (testCountry) params = { country: testCountry };
+    }
+
+    const res = await currencyAPI.detect(params);
     if (res.data && res.data.success && res.data.currency) {
       const detected = res.data.currency.toUpperCase();
       if (SUPPORTED_CURRENCIES.some((c) => c.code === detected)) {
         localStorage.setItem(STORAGE_KEYS.AUTO_DETECTED, detected);
-        return { currency: detected, isManual: false, country: res.data.country };
+        return { currency: detected, country: res.data.country };
       }
     }
   } catch (err) {
@@ -209,14 +202,12 @@ export const detectVisitorCurrency = async () => {
   }
 
   const guessed = guessInitialCurrency();
-  return { currency: guessed, isManual: false };
+  return { currency: guessed };
 };
 
 /**
- * Save manual user currency choice
+ * Legacy preference cleanup helper
  */
-export const saveUserCurrencyPreference = (currencyCode) => {
-  if (currencyCode) {
-    localStorage.setItem(STORAGE_KEYS.MANUAL_SELECTION, currencyCode.toUpperCase());
-  }
+export const saveUserCurrencyPreference = () => {
+  // Manual currency selection is disabled - automatic detection only
 };

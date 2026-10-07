@@ -6,7 +6,6 @@ import { useWishlist } from '../context/WishlistContext';
 import { useAuth } from '../context/AuthContext';
 import { useCurrency } from '../context/CurrencyContext';
 import { categoryAPI } from '../services/api';
-import CurrencySelector from './CurrencySelector';
 
 const Navbar = ({ onOpenSearch }) => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -68,17 +67,13 @@ const Navbar = ({ onOpenSearch }) => {
             style={{
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: '1rem',
-              position: 'relative'
+              justifyContent: 'center',
+              textAlign: 'center'
             }}
           >
-            <div style={{ flex: 1, textAlign: 'center' }}>
+            <div>
               <span>Complimentary shipping on handcrafted orders above {formatPrice(1999)}</span>
-              <Link to="/shop">EXPLORE EDITIONS →</Link>
-            </div>
-            <div style={{ flexShrink: 0 }}>
-              <CurrencySelector variant="header" />
+              <Link to="/shop" style={{ marginLeft: '0.75rem' }}>EXPLORE EDITIONS →</Link>
             </div>
           </div>
         </div>
@@ -492,19 +487,6 @@ const Navbar = ({ onOpenSearch }) => {
             <Link to="/contact" className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>
               Contact Atelier
             </Link>
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                paddingTop: '1rem',
-                borderTop: '1px solid var(--border-light)',
-                marginTop: '0.5rem'
-              }}
-            >
-              <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Store Currency</span>
-              <CurrencySelector variant="header" />
-            </div>
           </div>
         )}
       </header>

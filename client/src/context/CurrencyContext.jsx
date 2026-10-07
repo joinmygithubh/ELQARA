@@ -14,33 +14,27 @@ import {
 const CurrencyContext = createContext(null);
 
 export const CurrencyProvider = ({ children }) => {
-  // Initialize with manual selection or timezone heuristic immediately to avoid layout shift
+  // Initialize with previously auto-detected currency or pre-render timezone heuristic
   const [currency, setCurrencyState] = useState(() => guessInitialCurrency());
   const [rates, setRates] = useState(DEFAULT_RATES);
-  const [isManualSelection, setIsManualSelection] = useState(() => {
-    return Boolean(localStorage.getItem('elqara_user_currency'));
-  });
   const [loading, setLoading] = useState(true);
 
-  // Initialize rates and visitor detection
+  // Initialize rates and automated visitor country detection
   useEffect(() => {
     let isMounted = true;
 
     const initializeCurrency = async () => {
       try {
-        // 1. Fetch latest exchange rates
+        // 1. Fetch latest exchange rates from backend API
         const fetchedRates = await fetchRates();
         if (isMounted && fetchedRates) {
           setRates(fetchedRates);
         }
 
-        // 2. If user hasn't manually set currency before, run geo-detection
-        const manual = localStorage.getItem('elqara_user_currency');
-        if (!manual) {
-          const detected = await detectVisitorCurrency();
-          if (isMounted && detected?.currency) {
-            setCurrencyState(detected.currency);
-          }
+        // 2. Automatically detect visitor country and update localized currency
+        const detected = await detectVisitorCurrency();
+        if (isMounted && detected?.currency) {
+          setCurrencyState(detected.currency);
         }
       } catch (err) {
         console.warn('[CurrencyContext] Initialization error:', err);
@@ -58,20 +52,15 @@ export const CurrencyProvider = ({ children }) => {
     };
   }, []);
 
-  // Change currency explicitly
-  const setCurrency = useCallback((newCurrencyCode, isManual = true) => {
+  // Programmatic currency setter (for test/simulation harnesses if needed)
+  const setCurrency = useCallback((newCurrencyCode) => {
     if (!newCurrencyCode) return;
     const code = newCurrencyCode.toUpperCase();
     if (!SUPPORTED_CURRENCIES.some((c) => c.code === code)) return;
-
     setCurrencyState(code);
-    if (isManual) {
-      setIsManualSelection(true);
-      saveUserCurrencyPreference(code);
-    }
   }, []);
 
-  // Current rate for the selected currency against INR
+  // Current rate for the selected currency against base INR
   const currentRate = useMemo(() => {
     if (currency === 'INR') return 1;
     return rates[currency] || DEFAULT_RATES[currency] || 1;
@@ -85,7 +74,7 @@ export const CurrencyProvider = ({ children }) => {
     );
   }, [currency]);
 
-  // Format an INR amount into the currently selected currency (or optional override)
+  // Format an INR base amount into the detected display currency
   const formatPrice = useCallback(
     (inrAmount, overrideCurrency = null) => {
       const targetCurrency = (overrideCurrency || currency).toUpperCase();
@@ -95,7 +84,7 @@ export const CurrencyProvider = ({ children }) => {
     [currency, rates]
   );
 
-  // Convert an INR amount into numeric representation in target currency
+  // Convert an INR base amount into numeric value in the detected display currency
   const convertPrice = useCallback(
     (inrAmount, overrideCurrency = null) => {
       const targetCurrency = (overrideCurrency || currency).toUpperCase();
@@ -115,10 +104,9 @@ export const CurrencyProvider = ({ children }) => {
       setCurrency,
       formatPrice,
       convertPrice,
-      isManualSelection,
       loading
     }),
-    [currency, rates, currentRate, currencyConfig, setCurrency, formatPrice, convertPrice, isManualSelection, loading]
+    [currency, rates, currentRate, currencyConfig, setCurrency, formatPrice, convertPrice, loading]
   );
 
   return <CurrencyContext.Provider value={value}>{children}</CurrencyContext.Provider>;

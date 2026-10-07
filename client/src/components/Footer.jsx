@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Mail, Phone, ShieldCheck } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
-import CurrencySelector from './CurrencySelector';
 
 // Recognizable Brand SVG Icons
 const InstagramIcon = ({ size = 18 }) => (
@@ -347,10 +346,6 @@ const Footer = () => {
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flexWrap: 'wrap' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-              <span style={{ fontSize: '0.78rem', color: 'rgba(250, 247, 242, 0.7)' }}>Currency:</span>
-              <CurrencySelector variant="footer" />
-            </div>
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
               <ShieldCheck size={14} color="var(--accent-gold)" /> Secure 256-bit Encrypted Checkout
             </span>

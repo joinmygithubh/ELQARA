@@ -3,21 +3,27 @@
 // Pre-defined fallback rates against INR in case of API unavailability
 const FALLBACK_RATES = {
   INR: 1,
-  USD: 0.0116,
-  EUR: 0.0110,
-  GBP: 0.0092,
-  AUD: 0.0182,
-  CAD: 0.0164,
-  AED: 0.0427,
-  SGD: 0.0156,
-  JPY: 1.82
+  USD: 0.0104,
+  EUR: 0.0092,
+  GBP: 0.0078,
+  CAD: 0.0148,
+  AUD: 0.0149,
+  AED: 0.0381,
+  SAR: 0.0389,
+  SGD: 0.0133,
+  JPY: 1.64
 };
 
-const EUROZONE_COUNTRIES = [
-  'AT', 'BE', 'CY', 'EE', 'FI', 'FR', 'DE', 'GR', 'IE', 'IT',
-  'LV', 'LT', 'LU', 'MT', 'NL', 'PT', 'SK', 'SI', 'ES', 'HR'
+// All 27 European Union Member States + official Euro microstates
+const EU_COUNTRIES = [
+  'AT', 'BE', 'BG', 'HR', 'CY', 'CZ', 'DK', 'EE', 'FI', 'FR',
+  'DE', 'GR', 'HU', 'IE', 'IT', 'LV', 'LT', 'LU', 'MT', 'NL',
+  'PL', 'PT', 'RO', 'SK', 'SI', 'ES', 'SE',
+  // Official European microstates using EUR
+  'AD', 'MC', 'SM', 'VA', 'ME', 'XK'
 ];
 
+// Direct ISO country code to currency mapping
 const COUNTRY_TO_CURRENCY = {
   IN: 'INR',
   US: 'USD',
@@ -25,8 +31,7 @@ const COUNTRY_TO_CURRENCY = {
   CA: 'CAD',
   AU: 'AUD',
   AE: 'AED',
-  SG: 'SGD',
-  JP: 'JPY'
+  SA: 'SAR'
 };
 
 // In-memory cache for exchange rates
@@ -68,9 +73,10 @@ export const getLiveRates = async () => {
           USD: incomingRates.USD || FALLBACK_RATES.USD,
           EUR: incomingRates.EUR || FALLBACK_RATES.EUR,
           GBP: incomingRates.GBP || FALLBACK_RATES.GBP,
-          AUD: incomingRates.AUD || FALLBACK_RATES.AUD,
           CAD: incomingRates.CAD || FALLBACK_RATES.CAD,
+          AUD: incomingRates.AUD || FALLBACK_RATES.AUD,
           AED: incomingRates.AED || FALLBACK_RATES.AED,
+          SAR: incomingRates.SAR || FALLBACK_RATES.SAR,
           SGD: incomingRates.SGD || FALLBACK_RATES.SGD,
           JPY: incomingRates.JPY || FALLBACK_RATES.JPY
         };
@@ -104,35 +110,60 @@ export const getLiveRates = async () => {
 
 /**
  * Determine currency from ISO 3166-1 alpha-2 country code
+ * - India -> INR (₹)
+ * - United States -> USD ($)
+ * - United Kingdom -> GBP (£)
+ * - European Union countries -> EUR (€)
+ * - Canada -> CAD (C$)
+ * - Australia -> AUD (A$)
+ * - UAE -> AED
+ * - Saudi Arabia -> SAR
+ * - Other countries -> USD ($) (sensible global fallback)
+ * - Missing/unresolvable -> INR (base currency)
  */
 export const getCurrencyForCountry = (countryCode) => {
-  if (!countryCode) return 'INR';
-  const upper = countryCode.toUpperCase();
+  if (!countryCode || typeof countryCode !== 'string') return 'INR';
+  const upper = countryCode.trim().toUpperCase();
   if (COUNTRY_TO_CURRENCY[upper]) {
     return COUNTRY_TO_CURRENCY[upper];
   }
-  if (EUROZONE_COUNTRIES.includes(upper)) {
+  if (EU_COUNTRIES.includes(upper)) {
     return 'EUR';
   }
-  return 'INR';
+  // Standard international fallback for all other countries
+  return 'USD';
 };
 
 /**
- * Detect client country from request IP or headers
+ * Detect client country from Cloudflare headers, reverse proxy headers, or IP geolocation
  */
 export const detectClientCountry = async (req) => {
-  // 1. Check Cloudflare or reverse proxy country headers
-  const cfCountry = req.headers['cf-ipcountry'] || req.headers['x-country-code'];
-  if (cfCountry && cfCountry.length === 2) {
-    const country = cfCountry.toUpperCase();
+  // 1. Allow testing header/param for QA and test validation
+  const testCountry = req.headers['x-test-country'] || req.query?.country;
+  if (testCountry && typeof testCountry === 'string' && testCountry.trim().length === 2) {
+    const country = testCountry.trim().toUpperCase();
     return {
       country,
       currency: getCurrencyForCountry(country),
-      detectedBy: 'proxy-header'
+      detectedBy: 'test-override'
     };
   }
 
-  // 2. Extract client IP
+  // 2. Check Cloudflare or reverse proxy country headers
+  // Cloudflare automatically provides 'cf-ipcountry' on all incoming requests
+  const cfCountry = req.headers['cf-ipcountry'] || req.headers['x-country-code'] || req.headers['x-geo-country'] || req.headers['x-vercel-ip-country'];
+  if (cfCountry && typeof cfCountry === 'string') {
+    const cleanCountry = cfCountry.trim().toUpperCase();
+    if (cleanCountry.length === 2 && cleanCountry !== 'XX' && cleanCountry !== 'T1') {
+      return {
+        country: cleanCountry,
+        currency: getCurrencyForCountry(cleanCountry),
+        detectedBy: 'cloudflare-header'
+      };
+    }
+  }
+
+  // 3. Extract client IP
   let ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '';
   if (typeof ip === 'string' && ip.includes(',')) {
     ip = ip.split(',')[0].trim();
@@ -141,8 +172,8 @@ export const detectClientCountry = async (req) => {
     ip = ip.replace('::ffff:', '');
   }
 
-  // 3. Local/private IP check -> Default to India (INR) for local development
-  const isLocal = !ip || ip === '127.0.0.1' || ip === '::1' || ip.startsWith('192.168.') || ip.startsWith('10.') || ip.startsWith('172.16.');
+  // 4. Local/private IP check -> Default to India (INR) for local development
+  const isLocal = !ip || ip === '127.0.0.1' || ip === '::1' || ip === 'localhost' || ip.startsWith('192.168.') || ip.startsWith('10.') || ip.startsWith('172.16.');
   if (isLocal) {
     return {
       country: 'IN',
@@ -151,7 +182,7 @@ export const detectClientCountry = async (req) => {
     };
   }
 
-  // 4. Try IP geolocation service with 2s timeout
+  // 5. Try IP geolocation service with 2s timeout for non-Cloudflare production setups
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 2000);
@@ -160,17 +191,20 @@ export const detectClientCountry = async (req) => {
 
     if (geoRes.ok) {
       const geo = await geoRes.json();
-      const country = geo.country_code || 'IN';
-      return {
-        country,
-        currency: getCurrencyForCountry(country),
-        detectedBy: 'ip-geolocation'
-      };
+      const country = geo.country_code ? geo.country_code.toUpperCase() : null;
+      if (country && country.length === 2) {
+        return {
+          country,
+          currency: getCurrencyForCountry(country),
+          detectedBy: 'ip-geolocation'
+        };
+      }
     }
   } catch (err) {
     // Ignore and fallback gracefully
   }
 
+  // 6. Safe store base fallback
   return {
     country: 'IN',
     currency: 'INR',

@@ -483,6 +483,12 @@ h1, h2, h3, h4, h5, h6 {
   object-position: center;
 }
 
+@media (max-width: 900px) {
+  .hero-bg-img {
+    object-position: 72% center;
+  }
+}
+
 /* Gradient overlay to ensure text contrast while retaining warm ambient illumination */
 .hero-gradient {
   position: absolute;
