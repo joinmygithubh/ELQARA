@@ -119,6 +119,8 @@ const AppContent = () => {
                 <Route path="/about" element={<AboutPage />} />
                 <Route path="/journal" element={<JournalPage />} />
                 <Route path="/contact" element={<ContactPage />} />
+                <Route path="/trade" element={<ContactPage />} />
+                <Route path="/trade-and-projects" element={<ContactPage />} />
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </CustomerLayout>

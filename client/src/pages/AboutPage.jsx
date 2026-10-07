@@ -56,7 +56,7 @@ const AboutPage = () => {
               Located in the foothills of northern India, <strong>Saharanpur</strong> in Uttar Pradesh is globally acknowledged as the historic epicentre of woodcarving. For four centuries, families in this craft corridor have passed down lathe techniques, woodturning gouges, and hand-carving chisels.
             </p>
             <p style={{ fontSize: '0.98rem', lineHeight: 1.8, color: 'var(--text-body)', marginBottom: '2rem' }}>
-              ELQARA was established in Udhyog Nagar, Saharanpur, to protect this ancestral craft from industrial obsolescence. By uniting traditional woodturners with minimalist architectural sensibilities, we create lamps that feel at home in Tokyo apartments, Scandinavian villas, and Indian sanctuaries alike.
+              ELQARA was established in Saharanpur to protect this ancestral craft from industrial obsolescence. By uniting traditional woodturners with minimalist architectural sensibilities, we create lamps that feel at home in Tokyo apartments, Scandinavian villas, and Indian sanctuaries alike.
             </p>
             <div style={{ display: 'flex', gap: '2rem' }}>
               <div>

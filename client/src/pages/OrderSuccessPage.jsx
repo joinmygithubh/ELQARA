@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { CheckCircle, Package, ArrowRight, MapPin, Printer } from 'lucide-react';
+import { CheckCircle, Package, ArrowRight, Printer } from 'lucide-react';
 import { orderAPI } from '../services/api';
 import { useCurrency } from '../context/CurrencyContext';
 

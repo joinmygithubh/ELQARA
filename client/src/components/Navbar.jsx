@@ -86,195 +86,208 @@ const Navbar = ({ onOpenSearch }) => {
         {/* Main Navbar */}
         <div className="container">
           <nav className="nav-inner" aria-label="Main Navigation">
-            {/* Left: Brand Logo */}
+            {/* Left: Navigation Links & Mobile Toggle */}
+            <div className="nav-left">
+              {/* Mobile Menu Hamburger Toggle */}
+              <button
+                type="button"
+                className="icon-btn mobile-menu-toggle"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                aria-label="Toggle mobile menu"
+              >
+                {isMobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+              </button>
+
+              {/* Desktop Navigation Links */}
+              <ul className="nav-links">
+                <li>
+                  <NavLink
+                    to="/"
+                    end
+                    className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+                  >
+                    Home
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/shop"
+                    className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+                  >
+                    Shop
+                  </NavLink>
+                </li>
+
+                {/* Collections Dynamic Mega-Dropdown */}
+                <li
+                  style={{ position: 'relative' }}
+                  onMouseEnter={() => setIsCollectionsOpen(true)}
+                  onMouseLeave={() => setIsCollectionsOpen(false)}
+                >
+                  <button
+                    type="button"
+                    className="nav-link"
+                    aria-expanded={isCollectionsOpen}
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}
+                  >
+                    Collections <ChevronDown size={14} />
+                  </button>
+
+                  {isCollectionsOpen && (
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '100%',
+                        left: '0',
+                        width: '460px',
+                        backgroundColor: '#FFFFFF',
+                        boxShadow: 'var(--shadow-xl, 0 20px 40px rgba(0,0,0,0.12))',
+                        border: '1px solid var(--border-hairline)',
+                        padding: '1.25rem',
+                        borderRadius: 'var(--radius-sm)',
+                        zIndex: 1100,
+                        display: 'grid',
+                        gridTemplateColumns: '1.2fr 1fr',
+                        gap: '1.25rem'
+                      }}
+                    >
+                      {/* Column 1: Lighting Disciplines */}
+                      <div>
+                        <span
+                          style={{
+                            fontSize: '0.68rem',
+                            fontWeight: 700,
+                            letterSpacing: '0.12em',
+                            textTransform: 'uppercase',
+                            color: 'var(--accent-gold)',
+                            display: 'block',
+                            marginBottom: '0.6rem'
+                          }}
+                        >
+                          Lighting Disciplines
+                        </span>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+                          {(lightingCategories.length > 0 ? lightingCategories : categories.slice(0, 7)).map((cat) => (
+                            <Link
+                              key={cat._id || cat.slug}
+                              to={`/shop?category=${cat.slug}`}
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                padding: '0.35rem 0.5rem',
+                                fontSize: '0.82rem',
+                                color: 'var(--text-body)',
+                                borderRadius: '4px',
+                                textDecoration: 'none',
+                                transition: 'background 120ms ease'
+                              }}
+                              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#FAF7F2')}
+                              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+                            >
+                              <span>{cat.name}</span>
+                              {cat.productCount !== undefined && (
+                                <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{cat.productCount}</span>
+                              )}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Column 2: Home Decor & Objects */}
+                      <div style={{ borderLeft: '1px solid var(--border-hairline)', paddingLeft: '1.25rem' }}>
+                        <span
+                          style={{
+                            fontSize: '0.68rem',
+                            fontWeight: 700,
+                            letterSpacing: '0.12em',
+                            textTransform: 'uppercase',
+                            color: 'var(--accent-gold)',
+                            display: 'block',
+                            marginBottom: '0.6rem'
+                          }}
+                        >
+                          Decor & Atmosphere
+                        </span>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+                          {(decorCategories.length > 0 ? decorCategories : categories.slice(7)).map((cat) => (
+                            <Link
+                              key={cat._id || cat.slug}
+                              to={`/shop?category=${cat.slug}`}
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                padding: '0.35rem 0.5rem',
+                                fontSize: '0.82rem',
+                                color: 'var(--text-body)',
+                                borderRadius: '4px',
+                                textDecoration: 'none',
+                                transition: 'background 120ms ease'
+                              }}
+                              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#FAF7F2')}
+                              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+                            >
+                              <span>{cat.name}</span>
+                              {cat.productCount !== undefined && (
+                                <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{cat.productCount}</span>
+                              )}
+                            </Link>
+                          ))}
+                        </div>
+
+                        <div style={{ marginTop: '1rem', paddingTop: '0.75rem', borderTop: '1px solid var(--border-hairline)' }}>
+                          <Link
+                            to="/shop"
+                            style={{
+                              fontSize: '0.75rem',
+                              fontWeight: 600,
+                              letterSpacing: '0.08em',
+                              textTransform: 'uppercase',
+                              color: 'var(--text-main)',
+                              display: 'block'
+                            }}
+                          >
+                            View All 15 Disciplines →
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </li>
+
+                <li>
+                  <NavLink
+                    to="/about"
+                    className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+                  >
+                    About
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/journal"
+                    className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+                  >
+                    Journal
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/contact"
+                    className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+                  >
+                    Trade & Projects
+                  </NavLink>
+                </li>
+              </ul>
+            </div>
+
+            {/* Center: Brand Logo (Mathematically Centered to Viewport) */}
             <Link to="/" className="brand-logo" aria-label="ELQARA Homepage">
               <span className="brand-name">ELQARA</span>
               <span className="brand-tagline">OBJECTS FOR LIVING</span>
             </Link>
-
-            {/* Center: Desktop Navigation Links */}
-            <ul className="nav-links" style={{ display: 'flex' }}>
-              <li>
-                <NavLink
-                  to="/"
-                  end
-                  className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
-                >
-                  Home
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to="/shop"
-                  className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
-                >
-                  Shop
-                </NavLink>
-              </li>
-
-              {/* Collections Dynamic Mega-Dropdown */}
-              <li
-                style={{ position: 'relative' }}
-                onMouseEnter={() => setIsCollectionsOpen(true)}
-                onMouseLeave={() => setIsCollectionsOpen(false)}
-              >
-                <button
-                  type="button"
-                  className="nav-link"
-                  aria-expanded={isCollectionsOpen}
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}
-                >
-                  Collections <ChevronDown size={14} />
-                </button>
-
-                {isCollectionsOpen && (
-                  <div
-                    style={{
-                      position: 'absolute',
-                      top: '100%',
-                      left: '-50px',
-                      width: '460px',
-                      backgroundColor: '#FFFFFF',
-                      boxShadow: 'var(--shadow-xl, 0 20px 40px rgba(0,0,0,0.12))',
-                      border: '1px solid var(--border-hairline)',
-                      padding: '1.25rem',
-                      borderRadius: 'var(--radius-sm)',
-                      zIndex: 1100,
-                      display: 'grid',
-                      gridTemplateColumns: '1.2fr 1fr',
-                      gap: '1.25rem'
-                    }}
-                  >
-                    {/* Column 1: Lighting Disciplines */}
-                    <div>
-                      <span
-                        style={{
-                          fontSize: '0.68rem',
-                          fontWeight: 700,
-                          letterSpacing: '0.12em',
-                          textTransform: 'uppercase',
-                          color: 'var(--accent-gold)',
-                          display: 'block',
-                          marginBottom: '0.6rem'
-                        }}
-                      >
-                        Lighting Disciplines
-                      </span>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
-                        {(lightingCategories.length > 0 ? lightingCategories : categories.slice(0, 7)).map((cat) => (
-                          <Link
-                            key={cat._id || cat.slug}
-                            to={`/shop?category=${cat.slug}`}
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'space-between',
-                              padding: '0.35rem 0.5rem',
-                              fontSize: '0.82rem',
-                              color: 'var(--text-body)',
-                              borderRadius: '4px',
-                              textDecoration: 'none',
-                              transition: 'background 120ms ease'
-                            }}
-                            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#FAF7F2')}
-                            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-                          >
-                            <span>{cat.name}</span>
-                            {cat.productCount !== undefined && (
-                              <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{cat.productCount}</span>
-                            )}
-                          </Link>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Column 2: Home Decor & Objects */}
-                    <div style={{ borderLeft: '1px solid var(--border-hairline)', paddingLeft: '1.25rem' }}>
-                      <span
-                        style={{
-                          fontSize: '0.68rem',
-                          fontWeight: 700,
-                          letterSpacing: '0.12em',
-                          textTransform: 'uppercase',
-                          color: 'var(--accent-gold)',
-                          display: 'block',
-                          marginBottom: '0.6rem'
-                        }}
-                      >
-                        Decor & Atmosphere
-                      </span>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
-                        {(decorCategories.length > 0 ? decorCategories : categories.slice(7)).map((cat) => (
-                          <Link
-                            key={cat._id || cat.slug}
-                            to={`/shop?category=${cat.slug}`}
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'space-between',
-                              padding: '0.35rem 0.5rem',
-                              fontSize: '0.82rem',
-                              color: 'var(--text-body)',
-                              borderRadius: '4px',
-                              textDecoration: 'none',
-                              transition: 'background 120ms ease'
-                            }}
-                            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#FAF7F2')}
-                            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-                          >
-                            <span>{cat.name}</span>
-                            {cat.productCount !== undefined && (
-                              <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{cat.productCount}</span>
-                            )}
-                          </Link>
-                        ))}
-                      </div>
-
-                      <div style={{ marginTop: '1rem', paddingTop: '0.75rem', borderTop: '1px solid var(--border-hairline)' }}>
-                        <Link
-                          to="/shop"
-                          style={{
-                            fontSize: '0.75rem',
-                            fontWeight: 600,
-                            letterSpacing: '0.08em',
-                            textTransform: 'uppercase',
-                            color: 'var(--text-main)',
-                            display: 'block'
-                          }}
-                        >
-                          View All 15 Disciplines →
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </li>
-
-              <li>
-                <NavLink
-                  to="/about"
-                  className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
-                >
-                  About
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to="/journal"
-                  className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
-                >
-                  Journal
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to="/contact"
-                  className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
-                >
-                  Contact
-                </NavLink>
-              </li>
-            </ul>
 
             {/* Right: Actions (Search | Wishlist, Account, Cart) */}
             <div className="nav-actions">
@@ -435,17 +448,6 @@ const Navbar = ({ onOpenSearch }) => {
                 <ShoppingBag size={19} strokeWidth={1.5} />
                 <span className="badge-count">{itemCount}</span>
               </button>
-
-              {/* Mobile Menu Hamburger */}
-              <button
-                type="button"
-                className="icon-btn mobile-menu-toggle"
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                style={{ display: 'none' }}
-                aria-label="Toggle mobile menu"
-              >
-                {isMobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
-              </button>
             </div>
           </nav>
         </div>
@@ -490,7 +492,7 @@ const Navbar = ({ onOpenSearch }) => {
               Journal & Stories
             </Link>
             <Link to="/contact" className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>
-              Contact Atelier
+              Trade & Projects
             </Link>
             <div
               style={{
@@ -510,12 +512,12 @@ const Navbar = ({ onOpenSearch }) => {
       </header>
 
       <style>{`
-        @media (max-width: 900px) {
+        @media (max-width: 1024px) {
           .nav-links {
             display: none !important;
           }
           .mobile-menu-toggle {
-            display: flex !important;
+            display: inline-flex !important;
           }
         }
       `}</style>

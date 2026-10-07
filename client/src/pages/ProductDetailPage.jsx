@@ -537,7 +537,7 @@ const ProductDetailPage = () => {
                 <strong>Reinforced Wooden Crate Packaging:</strong> To safeguard fragile blown glass and fine wooden shades, all ELQARA luminaires are encased in custom foam cradles inside reinforced outer crates.
               </p>
               <p>
-                Dispatched directly from our Saharanpur atelier with full transit insurance. Express deliveries reach Delhi NCR within 48 hours, and Mumbai, Bengaluru, and other metro locations within 3-5 business days.
+                Dispatched with full transit insurance. Express deliveries reach Delhi NCR within 48 hours, and Mumbai, Bengaluru, and other metro locations within 3-5 business days.
               </p>
             </div>
           )}

@@ -206,7 +206,7 @@ const HomePage = () => {
                   marginBottom: '1.5rem'
                 }}
               >
-                For over four centuries, the city of Saharanpur in northern India has been celebrated as the global cradle of artisanal woodcarving and fine turnery. Every ELQARA lamp is born here — in our Udhyog Nagar atelier — where generational master woodturners shape sustainably sourced walnut, teak, and Sheesham timber by eye and touch.
+                For over four centuries, the city of Saharanpur in northern India has been celebrated as the global cradle of artisanal woodcarving and fine turnery. Every ELQARA lamp is born here — in our woodturning atelier — where generational master woodturners shape sustainably sourced walnut, teak, and Sheesham timber by eye and touch.
               </p>
               <p
                 style={{
