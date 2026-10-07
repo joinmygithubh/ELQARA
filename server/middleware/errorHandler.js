@@ -27,6 +27,12 @@ export const errorHandler = (err, req, res, next) => {
     message = `Invalid ID format for ${err.path}`;
   }
 
+  // Safeguard 22: Sanitize production 500 errors to prevent leaking connection strings or paths
+  if (process.env.NODE_ENV === 'production' && statusCode === 500) {
+    console.error('[Production Server Error]:', err);
+    message = 'An unexpected server error occurred. Please contact support.';
+  }
+
   res.status(statusCode).json({
     success: false,
     message,

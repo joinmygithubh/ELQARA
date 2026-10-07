@@ -112,7 +112,8 @@ const productSchema = new mongoose.Schema(
     }
   },
   {
-    timestamps: true
+    timestamps: true,
+    autoIndex: false
   }
 );
 
@@ -141,5 +142,5 @@ productSchema.index({ category: 1 });
 productSchema.index({ status: 1 });
 productSchema.index({ name: 'text', description: 'text', tags: 'text' });
 
-const Product = mongoose.model('Product', productSchema);
+const Product = mongoose.models.Product || mongoose.model('Product', productSchema);
 export default Product;

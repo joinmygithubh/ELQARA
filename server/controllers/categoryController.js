@@ -10,7 +10,7 @@ export const getCategories = async (req, res, next) => {
     const { includeInactive } = req.query;
     const filter = includeInactive === 'true' ? {} : { isActive: true };
 
-    const categories = await Category.find(filter).sort({ displayOrder: 1, name: 1 });
+    const categories = await Category.find(filter).sort({ displayOrder: 1, name: 1 }).lean();
 
     // Enhance categories with live product count
     const categoriesWithCounts = await Promise.all(
@@ -20,7 +20,7 @@ export const getCategories = async (req, res, next) => {
           status: 'active'
         });
         return {
-          ...cat.toObject(),
+          ...cat,
           productCount
         };
       })
@@ -31,7 +31,12 @@ export const getCategories = async (req, res, next) => {
       categories: categoriesWithCounts
     });
   } catch (error) {
-    next(error);
+    console.error('[getCategories Error]:', error.message);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Error fetching categories',
+      categories: []
+    });
   }
 };
 

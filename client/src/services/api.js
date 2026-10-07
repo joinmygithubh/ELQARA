@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: import.meta.env.VITE_API_URL || '/api',
   headers: {
     'Content-Type': 'application/json'
   }
@@ -111,6 +111,15 @@ export const uploadAPI = {
 export const currencyAPI = {
   getRates: () => api.get('/currency/rates'),
   detect: () => api.get('/currency/detect')
+};
+
+// Customer Enquiry endpoints
+export const enquiryAPI = {
+  submit: (data) => api.post('/enquiries', data),
+  getAllAdmin: (params) => api.get('/enquiries/admin/all', { params }),
+  getById: (id) => api.get(`/enquiries/${id}`),
+  updateStatus: (id, data) => api.patch(`/enquiries/${id}/status`, data),
+  delete: (id) => api.delete(`/enquiries/${id}`)
 };
 
 export default api;

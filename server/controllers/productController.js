@@ -106,7 +106,8 @@ export const getProducts = async (req, res, next) => {
       .populate('category', 'name slug')
       .sort(sortOptions)
       .skip(skip)
-      .limit(limitNum);
+      .limit(limitNum)
+      .lean();
 
     res.json({
       success: true,
@@ -117,7 +118,13 @@ export const getProducts = async (req, res, next) => {
       products
     });
   } catch (error) {
-    next(error);
+    console.error('[getProducts Error]:', error.message);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Error fetching products',
+      products: [],
+      total: 0
+    });
   }
 };
 

@@ -1,0 +1,16 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "elqara-backend",
+  "main": "worker.js",
+  "compatibility_date": "2025-09-01",
+  "compatibility_flags": [
+    "nodejs_compat",
+    "nodejs_compat_populate_process_env",
+    "enable_nodejs_http_server_modules"
+  ],
+  "vars": {
+    "NODE_ENV": "production",
+    "CLIENT_URL": "https://0f4cede7.elqara.pages.dev",
+    "ENQUIRY_EMAIL": "elqara.home@gmail.com"
+  }
+}

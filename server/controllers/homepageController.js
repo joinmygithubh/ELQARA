@@ -5,9 +5,9 @@ import Homepage from '../models/Homepage.js';
 // @access  Public
 export const getHomepageSettings = async (req, res, next) => {
   try {
-    let settings = await Homepage.findOne();
+    let settings = await Homepage.findOne().lean();
     if (!settings) {
-      settings = await Homepage.create({
+      const created = await Homepage.create({
         heroSlides: [
           {
             preheading: 'PREMIUM HOME DÉCOR & LIGHTING',
@@ -45,6 +45,7 @@ export const getHomepageSettings = async (req, res, next) => {
           enabled: true
         }
       });
+      settings = created.toObject ? created.toObject() : created;
     }
 
     res.json({
@@ -52,7 +53,11 @@ export const getHomepageSettings = async (req, res, next) => {
       settings
     });
   } catch (error) {
-    next(error);
+    console.error('[getHomepageSettings Error]:', error.message);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Error fetching homepage settings'
+    });
   }
 };
 

@@ -11,13 +11,15 @@ import {
   Star,
   ChevronRight,
   CheckCircle,
-  Clock
+  Clock,
+  MessageSquare
 } from 'lucide-react';
 import { productAPI } from '../services/api';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useCurrency } from '../context/CurrencyContext';
 import ProductCard from '../components/ProductCard';
+import EnquiryModal from '../components/EnquiryModal';
 
 const ProductDetailPage = () => {
   const { slug } = useParams();
@@ -32,6 +34,7 @@ const ProductDetailPage = () => {
   const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('specifications'); // 'specifications' | 'craft' | 'shipping'
+  const [isEnquiryOpen, setIsEnquiryOpen] = useState(false);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -380,6 +383,40 @@ const ProductDetailPage = () => {
                   <span>Instant Checkout — Buy Now</span>
                 </button>
               )}
+
+              {/* Bespoke / Product Enquiry Button */}
+              <button
+                type="button"
+                onClick={() => setIsEnquiryOpen(true)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.6rem',
+                  backgroundColor: 'transparent',
+                  color: 'var(--text-main, #1C1917)',
+                  padding: '0.85rem',
+                  fontWeight: 600,
+                  fontSize: '0.82rem',
+                  letterSpacing: '0.06em',
+                  textTransform: 'uppercase',
+                  border: '1px solid var(--border-medium, #D5CEBE)',
+                  borderRadius: 'var(--radius-xs)',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--accent-gold)';
+                  e.currentTarget.style.color = 'var(--accent-gold)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--border-medium, #D5CEBE)';
+                  e.currentTarget.style.color = 'var(--text-main, #1C1917)';
+                }}
+              >
+                <MessageSquare size={16} />
+                <span>Enquire About This Piece / Custom Dimensions</span>
+              </button>
             </div>
 
             {/* Atelier Assurance Badges */}
@@ -521,6 +558,13 @@ const ProductDetailPage = () => {
           </div>
         )}
       </section>
+
+      {/* Product Enquiry Modal */}
+      <EnquiryModal
+        isOpen={isEnquiryOpen}
+        onClose={() => setIsEnquiryOpen(false)}
+        product={product}
+      />
     </div>
   );
 };

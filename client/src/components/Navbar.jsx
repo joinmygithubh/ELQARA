@@ -5,6 +5,7 @@ import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useAuth } from '../context/AuthContext';
 import { useCurrency } from '../context/CurrencyContext';
+import { categoryAPI } from '../services/api';
 import CurrencySelector from './CurrencySelector';
 
 const Navbar = ({ onOpenSearch }) => {
@@ -12,6 +13,7 @@ const Navbar = ({ onOpenSearch }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
   const [isCollectionsOpen, setIsCollectionsOpen] = useState(false);
+  const [categories, setCategories] = useState([]);
 
   const { itemCount, openCart } = useCart();
   const { wishlistCount, openWishlist } = useWishlist();
@@ -19,6 +21,14 @@ const Navbar = ({ onOpenSearch }) => {
   const { formatPrice } = useCurrency();
   const navigate = useNavigate();
   const location = useLocation();
+
+  useEffect(() => {
+    categoryAPI.getAll().then((res) => {
+      if (res.data?.success && res.data.categories) {
+        setCategories(res.data.categories);
+      }
+    }).catch(() => {});
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -39,6 +49,14 @@ const Navbar = ({ onOpenSearch }) => {
     logout();
     navigate('/');
   };
+
+  // Split categories for luxury mega-dropdown
+  const lightingCategories = categories.filter((c) =>
+    ['table-lamps', 'floor-lamps', 'pendant-lights', 'wall-lights', 'desk-lamps', 'ceiling-lights', 'bedside-lamps', 'decorative-lamps', 'led-lighting', 'smart-lighting'].includes(c.slug)
+  );
+  const decorCategories = categories.filter((c) =>
+    ['night-lights', 'ambient-lighting', 'candle-lamps', 'lighting-accessories', 'home-decor'].includes(c.slug)
+  );
 
   return (
     <>
@@ -94,7 +112,7 @@ const Navbar = ({ onOpenSearch }) => {
                 </NavLink>
               </li>
 
-              {/* Collections Dropdown */}
+              {/* Collections Dynamic Mega-Dropdown */}
               <li
                 style={{ position: 'relative' }}
                 onMouseEnter={() => setIsCollectionsOpen(true)}
@@ -114,68 +132,120 @@ const Navbar = ({ onOpenSearch }) => {
                     style={{
                       position: 'absolute',
                       top: '100%',
-                      left: '0',
-                      width: '240px',
+                      left: '-50px',
+                      width: '460px',
                       backgroundColor: '#FFFFFF',
-                      boxShadow: 'var(--shadow-lg)',
+                      boxShadow: 'var(--shadow-xl, 0 20px 40px rgba(0,0,0,0.12))',
                       border: '1px solid var(--border-hairline)',
-                      padding: '0.75rem 0',
+                      padding: '1.25rem',
                       borderRadius: 'var(--radius-sm)',
-                      zIndex: 1100
+                      zIndex: 1100,
+                      display: 'grid',
+                      gridTemplateColumns: '1.2fr 1fr',
+                      gap: '1.25rem'
                     }}
                   >
-                    <Link
-                      to="/shop?category=table-lamps"
-                      style={{
-                        display: 'block',
-                        padding: '0.65rem 1.25rem',
-                        fontSize: '0.85rem',
-                        color: 'var(--text-body)'
-                      }}
-                      onMouseEnter={(e) => (e.target.style.backgroundColor = '#FAF7F2')}
-                      onMouseLeave={(e) => (e.target.style.backgroundColor = 'transparent')}
-                    >
-                      Table Lamps
-                    </Link>
-                    <Link
-                      to="/shop?category=floor-lamps"
-                      style={{
-                        display: 'block',
-                        padding: '0.65rem 1.25rem',
-                        fontSize: '0.85rem',
-                        color: 'var(--text-body)'
-                      }}
-                      onMouseEnter={(e) => (e.target.style.backgroundColor = '#FAF7F2')}
-                      onMouseLeave={(e) => (e.target.style.backgroundColor = 'transparent')}
-                    >
-                      Floor Lamps
-                    </Link>
-                    <Link
-                      to="/shop?category=pendant-lights"
-                      style={{
-                        display: 'block',
-                        padding: '0.65rem 1.25rem',
-                        fontSize: '0.85rem',
-                        color: 'var(--text-body)'
-                      }}
-                      onMouseEnter={(e) => (e.target.style.backgroundColor = '#FAF7F2')}
-                      onMouseLeave={(e) => (e.target.style.backgroundColor = 'transparent')}
-                    >
-                      Pendant Lights
-                    </Link>
-                    <Link
-                      to="/shop?category=home-decor"
-                      style={{
-                        display: 'block',
-                        padding: '0.65rem 1.25rem',
-                        fontSize: '0.85rem',
-                        color: 'var(--text-body)'
-                      }}
-                      onMouseEnter={(e) => (e.target.style.backgroundColor = '#FAF7F2')}
-                      onMouseLeave={(e) => (e.target.style.backgroundColor = 'transparent')}
-                    >
-                      Home Décor & Objects
-                    </Link>
+                    {/* Column 1: Lighting Disciplines */}
+                    <div>
+                      <span
+                        style={{
+                          fontSize: '0.68rem',
+                          fontWeight: 700,
+                          letterSpacing: '0.12em',
+                          textTransform: 'uppercase',
+                          color: 'var(--accent-gold)',
+                          display: 'block',
+                          marginBottom: '0.6rem'
+                        }}
+                      >
+                        Lighting Disciplines
+                      </span>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+                        {(lightingCategories.length > 0 ? lightingCategories : categories.slice(0, 7)).map((cat) => (
+                          <Link
+                            key={cat._id || cat.slug}
+                            to={`/shop?category=${cat.slug}`}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              padding: '0.35rem 0.5rem',
+                              fontSize: '0.82rem',
+                              color: 'var(--text-body)',
+                              borderRadius: '4px',
+                              textDecoration: 'none',
+                              transition: 'background 120ms ease'
+                            }}
+                            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#FAF7F2')}
+                            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+                          >
+                            <span>{cat.name}</span>
+                            {cat.productCount !== undefined && (
+                              <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{cat.productCount}</span>
+                            )}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Column 2: Home Decor & Objects */}
+                    <div style={{ borderLeft: '1px solid var(--border-hairline)', paddingLeft: '1.25rem' }}>
+                      <span
+                        style={{
+                          fontSize: '0.68rem',
+                          fontWeight: 700,
+                          letterSpacing: '0.12em',
+                          textTransform: 'uppercase',
+                          color: 'var(--accent-gold)',
+                          display: 'block',
+                          marginBottom: '0.6rem'
+                        }}
+                      >
+                        Decor & Atmosphere
+                      </span>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+                        {(decorCategories.length > 0 ? decorCategories : categories.slice(7)).map((cat) => (
+                          <Link
+                            key={cat._id || cat.slug}
+                            to={`/shop?category=${cat.slug}`}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              padding: '0.35rem 0.5rem',
+                              fontSize: '0.82rem',
+                              color: 'var(--text-body)',
+                              borderRadius: '4px',
+                              textDecoration: 'none',
+                              transition: 'background 120ms ease'
+                            }}
+                            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#FAF7F2')}
+                            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+                          >
+                            <span>{cat.name}</span>
+                            {cat.productCount !== undefined && (
+                              <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{cat.productCount}</span>
+                            )}
+                          </Link>
+                        ))}
+                      </div>
+
+                      <div style={{ marginTop: '1rem', paddingTop: '0.75rem', borderTop: '1px solid var(--border-hairline)' }}>
+                        <Link
+                          to="/shop"
+                          style={{
+                            fontSize: '0.75rem',
+                            fontWeight: 600,
+                            letterSpacing: '0.08em',
+                            textTransform: 'uppercase',
+                            color: 'var(--text-main)',
+                            display: 'block'
+                          }}
+                        >
+                          View All 15 Disciplines →
+                        </Link>
+                      </div>
+                    </div>
                   </div>
                 )}
               </li>
@@ -396,20 +466,23 @@ const Navbar = ({ onOpenSearch }) => {
               Home
             </Link>
             <Link to="/shop" className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>
-              Shop Catalog
+              Shop Catalog (All 15 Disciplines)
             </Link>
-            <Link to="/shop?category=table-lamps" className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>
-              Table Lamps
-            </Link>
-            <Link to="/shop?category=floor-lamps" className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>
-              Floor Lamps
-            </Link>
-            <Link to="/shop?category=pendant-lights" className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>
-              Pendant & Ceiling Lights
-            </Link>
-            <Link to="/shop?category=home-decor" className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>
-              Home Décor & Objects
-            </Link>
+            <div style={{ paddingLeft: '0.75rem', borderLeft: '2px solid var(--border-medium)', display: 'flex', flexDirection: 'column', gap: '0.5rem', maxHeight: '200px', overflowY: 'auto' }}>
+              <span style={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.12em', color: 'var(--text-muted)' }}>
+                Disciplines
+              </span>
+              {categories.map((cat) => (
+                <Link
+                  key={cat._id || cat.slug}
+                  to={`/shop?category=${cat.slug}`}
+                  style={{ fontSize: '0.85rem', color: 'var(--text-body)', textDecoration: 'none' }}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  {cat.name} {cat.productCount ? `(${cat.productCount})` : ''}
+                </Link>
+              ))}
+            </div>
             <Link to="/about" className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>
               About Saharanpur Heritage
             </Link>

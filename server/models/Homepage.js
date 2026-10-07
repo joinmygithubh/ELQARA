@@ -31,9 +31,10 @@ const homepageSchema = new mongoose.Schema(
     }
   },
   {
-    timestamps: true
+    timestamps: true,
+    autoIndex: false
   }
 );
 
-const Homepage = mongoose.model('Homepage', homepageSchema);
+const Homepage = mongoose.models.Homepage || mongoose.model('Homepage', homepageSchema);
 export default Homepage;

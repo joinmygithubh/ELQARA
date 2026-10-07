@@ -2,7 +2,11 @@ import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 
 const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET || 'elqara_super_secret_jwt_key_2026_premium_lamp_decor', {
+  const jwtSecret = process.env.JWT_SECRET;
+  if (!jwtSecret) {
+    throw new Error('JWT_SECRET environment variable is missing.');
+  }
+  return jwt.sign({ id }, jwtSecret, {
     expiresIn: '30d'
   });
 };

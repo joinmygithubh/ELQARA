@@ -15,7 +15,11 @@ export const protect = async (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'elqara_super_secret_jwt_key_2026_premium_lamp_decor');
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) {
+      throw new Error('JWT_SECRET environment variable is missing.');
+    }
+    const decoded = jwt.verify(token, jwtSecret);
     const user = await User.findById(decoded.id).select('-password');
     if (!user) {
       return res.status(401).json({

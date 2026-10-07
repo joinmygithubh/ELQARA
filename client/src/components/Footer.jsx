@@ -104,27 +104,37 @@ const Footer = () => {
             <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.75rem', fontSize: '0.88rem' }}>
               <li>
                 <Link to="/shop?category=table-lamps" style={{ color: 'inherit', transition: 'color 150ms' }} onMouseEnter={(e) => (e.target.style.color = '#FFF')} onMouseLeave={(e) => (e.target.style.color = 'inherit')}>
-                  Table & Accent Lamps
+                  Table Lamps
                 </Link>
               </li>
               <li>
                 <Link to="/shop?category=floor-lamps" style={{ color: 'inherit', transition: 'color 150ms' }} onMouseEnter={(e) => (e.target.style.color = '#FFF')} onMouseLeave={(e) => (e.target.style.color = 'inherit')}>
-                  Architectural Floor Lamps
+                  Floor Lamps
                 </Link>
               </li>
               <li>
                 <Link to="/shop?category=pendant-lights" style={{ color: 'inherit', transition: 'color 150ms' }} onMouseEnter={(e) => (e.target.style.color = '#FFF')} onMouseLeave={(e) => (e.target.style.color = 'inherit')}>
-                  Pleated Pendant Lights
+                  Pendant Lights
+                </Link>
+              </li>
+              <li>
+                <Link to="/shop?category=wall-lights" style={{ color: 'inherit', transition: 'color 150ms' }} onMouseEnter={(e) => (e.target.style.color = '#FFF')} onMouseLeave={(e) => (e.target.style.color = 'inherit')}>
+                  Wall Lights & Sconces
+                </Link>
+              </li>
+              <li>
+                <Link to="/shop?category=candle-lamps" style={{ color: 'inherit', transition: 'color 150ms' }} onMouseEnter={(e) => (e.target.style.color = '#FFF')} onMouseLeave={(e) => (e.target.style.color = 'inherit')}>
+                  Candle Lamps & Warmers
                 </Link>
               </li>
               <li>
                 <Link to="/shop?category=home-decor" style={{ color: 'inherit', transition: 'color 150ms' }} onMouseEnter={(e) => (e.target.style.color = '#FFF')} onMouseLeave={(e) => (e.target.style.color = 'inherit')}>
-                  Saharanpur Hand-carved Decor
+                  Saharanpur Home Decor
                 </Link>
               </li>
               <li>
-                <Link to="/shop" style={{ color: 'inherit', transition: 'color 150ms' }} onMouseEnter={(e) => (e.target.style.color = '#FFF')} onMouseLeave={(e) => (e.target.style.color = 'inherit')}>
-                  All Editions
+                <Link to="/shop" style={{ color: 'var(--accent-gold)', fontWeight: 600, transition: 'color 150ms' }} onMouseEnter={(e) => (e.target.style.color = '#FFF')} onMouseLeave={(e) => (e.target.style.color = 'var(--accent-gold)')}>
+                  All 15 Disciplines →
                 </Link>
               </li>
             </ul>

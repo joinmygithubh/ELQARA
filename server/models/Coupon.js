@@ -49,7 +49,8 @@ const couponSchema = new mongoose.Schema(
     }
   },
   {
-    timestamps: true
+    timestamps: true,
+    autoIndex: false
   }
 );
 
@@ -79,5 +80,5 @@ couponSchema.methods.calculateDiscount = function (orderTotal) {
   return Math.min(Math.round(discount), orderTotal);
 };
 
-const Coupon = mongoose.model('Coupon', couponSchema);
+const Coupon = mongoose.models.Coupon || mongoose.model('Coupon', couponSchema);
 export default Coupon;

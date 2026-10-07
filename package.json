@@ -8,6 +8,7 @@
     "seed": "npm run seed --prefix server"
   },
   "devDependencies": {
-    "concurrently": "^9.2.4"
+    "concurrently": "^9.2.4",
+    "wrangler": "^4.147.0"
   }
 }

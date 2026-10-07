@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { MapPin, Phone, Mail, Clock, Send, CheckCircle2 } from 'lucide-react';
+import { MapPin, Phone, Mail, Clock, Send, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
+import { enquiryAPI } from '../services/api';
 
 const ContactPage = () => {
   const { showToast } = useToast();
@@ -12,15 +13,63 @@ const ContactPage = () => {
     message: ''
   });
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.name || !formData.email || !formData.message) {
-      showToast('Please fill out all required fields', 'error');
+    if (loading) return;
+
+    if (!formData.name.trim() || formData.name.trim().length < 2) {
+      showToast('Please provide your name (at least 2 characters)', 'error');
+      setError('Please provide your name.');
       return;
     }
-    setSubmitted(true);
-    showToast('Your message has been delivered to the Saharanpur Atelier.', 'success');
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!formData.email.trim() || !emailRegex.test(formData.email.trim())) {
+      showToast('Please enter a valid email address', 'error');
+      setError('Please enter a valid email address.');
+      return;
+    }
+
+    if (!formData.message.trim() || formData.message.trim().length < 5) {
+      showToast('Message must be at least 5 characters', 'error');
+      setError('Please provide a message with at least 5 characters.');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    try {
+      const payload = {
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        phone: formData.phone.trim(),
+        subject: formData.subject.trim(),
+        message: formData.message.trim(),
+        productUrl: typeof window !== 'undefined' ? window.location.href : ''
+      };
+
+      const res = await enquiryAPI.submit(payload);
+
+      if (res.data?.success) {
+        setSubmitted(true);
+        showToast('Your enquiry has been delivered to elqara.home@gmail.com.', 'success');
+      } else {
+        throw new Error(res.data?.message || 'Submission failed');
+      }
+    } catch (err) {
+      const errMsg =
+        err.response?.data?.message ||
+        err.message ||
+        "We couldn't send your enquiry right now. Please try again.";
+      setError(errMsg);
+      showToast(errMsg, 'error');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -245,9 +294,50 @@ const ContactPage = () => {
                   />
                 </div>
 
-                <button type="submit" className="btn-dark" style={{ padding: '0.95rem' }}>
-                  <Send size={16} />
-                  <span>Transmit Inquiry to Saharanpur</span>
+                {error && (
+                  <div
+                    style={{
+                      backgroundColor: '#FEF2F2',
+                      border: '1px solid #FCA5A5',
+                      borderRadius: '4px',
+                      padding: '0.75rem 1rem',
+                      color: '#B91C1C',
+                      fontSize: '0.85rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px'
+                    }}
+                  >
+                    <AlertCircle size={16} style={{ flexShrink: 0 }} />
+                    <span>{error}</span>
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="btn-dark"
+                  style={{
+                    padding: '0.95rem',
+                    cursor: loading ? 'not-allowed' : 'pointer',
+                    opacity: loading ? 0.75 : 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px'
+                  }}
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 size={16} className="spin" />
+                      <span>Transmitting Inquiry to Atelier...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Send size={16} />
+                      <span>Transmit Inquiry to Saharanpur</span>
+                    </>
+                  )}
                 </button>
               </form>
             )}

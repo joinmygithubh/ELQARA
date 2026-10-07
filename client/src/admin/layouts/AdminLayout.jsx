@@ -11,7 +11,8 @@ import {
   LogOut,
   ExternalLink,
   ShieldCheck,
-  ChevronRight
+  ChevronRight,
+  MessageSquare
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
@@ -29,6 +30,7 @@ const AdminLayout = () => {
     { to: '/admin/products', label: 'Products & Editions', icon: Package },
     { to: '/admin/categories', label: 'Disciplines & Categories', icon: Layers },
     { to: '/admin/orders', label: 'Orders & Shipments', icon: ShoppingBag },
+    { to: '/admin/enquiries', label: 'Client Enquiries', icon: MessageSquare },
     { to: '/admin/customers', label: 'Collectors / Customers', icon: Users },
     { to: '/admin/coupons', label: 'Coupons & Promotions', icon: Tag },
     { to: '/admin/homepage', label: 'Homepage Settings', icon: Home }

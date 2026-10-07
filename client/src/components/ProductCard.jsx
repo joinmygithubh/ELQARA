@@ -1,14 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Heart, ShoppingBag, Eye, Star } from 'lucide-react';
+import { Heart, ShoppingBag, Eye, Star, MessageSquare } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useCurrency } from '../context/CurrencyContext';
+import EnquiryModal from './EnquiryModal';
 
 const ProductCard = ({ product, onQuickView }) => {
   const { addToCart } = useCart();
   const { isInWishlist, toggleWishlist } = useWishlist();
   const { formatPrice } = useCurrency();
+  const [isEnquiryOpen, setIsEnquiryOpen] = useState(false);
 
   if (!product) return null;
 
@@ -75,6 +77,20 @@ const ProductCard = ({ product, onQuickView }) => {
             </button>
           </div>
         )}
+
+        {isOutOfStock && (
+          <div className="card-hover-actions">
+            <button
+              type="button"
+              className="btn-quick-add"
+              onClick={() => setIsEnquiryOpen(true)}
+              style={{ backgroundColor: '#1C1B18' }}
+            >
+              <MessageSquare size={14} />
+              <span>Request / Enquire</span>
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="product-info">
@@ -115,6 +131,13 @@ const ProductCard = ({ product, onQuickView }) => {
           )}
         </div>
       </div>
+
+      {/* Product Enquiry Modal */}
+      <EnquiryModal
+        isOpen={isEnquiryOpen}
+        onClose={() => setIsEnquiryOpen(false)}
+        product={product}
+      />
     </article>
   );
 };

@@ -40,6 +40,7 @@ import AdminOrders from './admin/pages/AdminOrders';
 import AdminCustomers from './admin/pages/AdminCustomers';
 import AdminCoupons from './admin/pages/AdminCoupons';
 import AdminHomepage from './admin/pages/AdminHomepage';
+import AdminEnquiries from './admin/pages/AdminEnquiries';
 
 // Protected Route helper for Admins
 const ProtectedAdminRoute = ({ children }) => {
@@ -93,6 +94,7 @@ const AppContent = () => {
           <Route path="products/edit/:id" element={<AdminProductForm />} />
           <Route path="categories" element={<AdminCategories />} />
           <Route path="orders" element={<AdminOrders />} />
+          <Route path="enquiries" element={<AdminEnquiries />} />
           <Route path="customers" element={<AdminCustomers />} />
           <Route path="coupons" element={<AdminCoupons />} />
           <Route path="homepage" element={<AdminHomepage />} />
