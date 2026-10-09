@@ -44,42 +44,55 @@ const seedDatabase = async () => {
     }
 
     // 1. Seed/Verify Users
-    let adminUser = await User.findOne({ email: 'admin@elqara.com' });
+    const adminEmail = (process.env.ADMIN_EMAIL || 'admin@elqara.com').toLowerCase();
+    let adminUser = await User.findOne({ email: adminEmail });
+
     if (!adminUser) {
-      adminUser = await User.create({
-        name: 'ELQARA Administrator',
-        email: 'admin@elqara.com',
-        password: 'ElqaraAdmin@2026',
-        phone: '+91 98765 43210',
-        role: 'admin'
-      });
-      console.log('[Seed] Created Admin (admin@elqara.com)');
+      if (isProduction && !process.env.ADMIN_INITIAL_PASSWORD && !process.env.ADMIN_PASSWORD) {
+        console.warn('[Seed Safeguard]: Admin user does not exist in production.');
+        console.warn('[Seed Safeguard]: Skipping auto-creation to prevent default password vulnerability.');
+        console.warn('[Seed Safeguard]: Please set ADMIN_INITIAL_PASSWORD or ADMIN_PASSWORD to initialize.');
+      } else {
+        const initialPassword = process.env.ADMIN_INITIAL_PASSWORD || process.env.ADMIN_PASSWORD || 'ElqaraAdmin@2026';
+        adminUser = await User.create({
+          name: 'ELQARA Administrator',
+          email: adminEmail,
+          password: initialPassword,
+          phone: process.env.ADMIN_PHONE || '+91 98765 43210',
+          role: 'admin'
+        });
+        console.log(`[Seed] Administrator account initialized for: ${adminEmail}`);
+      }
     } else {
-      console.log('[Seed] Admin user verified (admin@elqara.com)');
+      console.log(`[Seed] Real administrator account preserved: ${adminEmail}`);
     }
 
-    let demoCustomer = await User.findOne({ email: 'arjun.sharma@example.com' });
-    if (!demoCustomer && (!isProduction || forceReset)) {
-      demoCustomer = await User.create({
-        name: 'Arjun Sharma',
-        email: 'arjun.sharma@example.com',
-        password: 'CustomerPass@123',
-        phone: '+91 98111 22334',
-        role: 'customer',
-        addresses: [
-          {
-            fullName: 'Arjun Sharma',
-            phone: '+91 98111 22334',
-            street: 'Apartment 402, Magnolia Enclave, Sector 54',
-            landmark: 'Near Golf Course Road',
-            city: 'Gurugram',
-            state: 'Haryana',
-            pincode: '122002',
-            isDefault: true
-          }
-        ]
-      });
-      console.log('[Seed] Created Customer (arjun.sharma@example.com)');
+    // Demo customer is strictly isolated to non-production environments
+    let demoCustomer = null;
+    if (!isProduction) {
+      demoCustomer = await User.findOne({ email: 'arjun.sharma@example.com' });
+      if (!demoCustomer) {
+        demoCustomer = await User.create({
+          name: 'Arjun Sharma',
+          email: 'arjun.sharma@example.com',
+          password: process.env.DEMO_CUSTOMER_PASSWORD || 'CustomerPass@123',
+          phone: '+91 98111 22334',
+          role: 'customer',
+          addresses: [
+            {
+              fullName: 'Arjun Sharma',
+              phone: '+91 98111 22334',
+              street: 'Apartment 402, Magnolia Enclave, Sector 54',
+              landmark: 'Near Golf Course Road',
+              city: 'Gurugram',
+              state: 'Haryana',
+              pincode: '122002',
+              isDefault: true
+            }
+          ]
+        });
+        console.log('[Seed (Dev Only)] Created local development customer: arjun.sharma@example.com');
+      }
     }
 
 
@@ -202,7 +215,7 @@ const seedDatabase = async () => {
       {
         name: 'Home Decor',
         slug: 'home-decor',
-        description: 'Handcrafted Sheesham wood vessels, stone bowls, and decorative curios created by Saharanpur master artisans.',
+        description: 'Handcrafted Sheesham wood vessels, stone bowls, and decorative curios created by master artisans.',
         image: '/uploads/prod-carved-vessel.jpg',
         displayOrder: 15,
         isActive: true
@@ -2493,7 +2506,7 @@ const seedDatabase = async () => {
             subtitle: 'Elevate expansive living rooms with solid walnut arcs and hand-blown opaline diffusers.',
             buttonText: 'VIEW FLOOR LAMPS',
             buttonLink: '/shop?category=floor-lamps',
-            badgeText: 'Saharanpur Craft',
+            badgeText: 'Artisanal Woodcraft',
             image: '/uploads/hero-slide-3.jpg',
             slideNumber: '03'
           }
@@ -2502,8 +2515,8 @@ const seedDatabase = async () => {
           text: 'Complimentary white-glove shipping on all handcrafted artisanal orders across India',
           enabled: true
         },
-        featuredCollectionTitle: 'The Saharanpur Heritage',
-        featuredCollectionSubtitle: 'Sculpted by generational woodturners and brass artisans in Uttar Pradesh.'
+        featuredCollectionTitle: 'The Atelier Collection',
+        featuredCollectionSubtitle: 'Sculpted by master woodturners and brass artisans.'
       });
       console.log('[Seed] Created default Homepage configuration');
     } else {
@@ -2602,7 +2615,7 @@ const seedDatabase = async () => {
     console.log('----------------------------------------------------');
     console.log(isProduction && !forceReset ? 'ELQARA DATABASE SYNC COMPLETED SAFELY (NON-DESTRUCTIVE)' : 'ELQARA DATABASE SEEDED SUCCESSFULLY');
     console.log(`Total Products Verified: ${createdProducts.length}`);
-    console.log('Admin Login: admin@elqara.com / ElqaraAdmin@2026');
+    console.log(`Administrator Status: Verified (${adminEmail})`);
     console.log('----------------------------------------------------');
     process.exit(0);
   } catch (error) {

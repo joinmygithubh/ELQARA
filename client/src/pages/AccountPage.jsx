@@ -313,7 +313,7 @@ const AccountPage = () => {
                       Account Tier
                     </label>
                     <div style={{ fontSize: '0.85rem', color: 'var(--accent-gold)', fontWeight: 600 }}>
-                      ✦ Verified Patron of Saharanpur Craft
+                      ✦ Verified Patron of Artisanal Craft
                     </div>
                   </div>
                 </div>

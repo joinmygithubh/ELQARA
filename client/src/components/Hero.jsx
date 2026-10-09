@@ -17,7 +17,8 @@ const Hero = ({ customSlides }) => {
       buttonLink: '/shop',
       badgeText: 'Handcrafted\nin India',
       image: heroSlide1,
-      slideNumber: '01'
+      slideNumber: '01',
+      mobilePosition: '78% center'
     },
     {
       id: 2,
@@ -29,7 +30,8 @@ const Hero = ({ customSlides }) => {
       buttonLink: '/shop?category=table-lamps',
       badgeText: 'Artisanal\nBrasswork',
       image: heroSlide2,
-      slideNumber: '02'
+      slideNumber: '02',
+      mobilePosition: '72% center'
     },
     {
       id: 3,
@@ -39,9 +41,10 @@ const Hero = ({ customSlides }) => {
         'Elevate expansive living rooms with solid walnut arcs and hand-blown opaline diffusers.',
       buttonText: 'VIEW FLOOR LAMPS',
       buttonLink: '/shop?category=floor-lamps',
-      badgeText: 'Saharanpur\nCraft',
+      badgeText: 'Artisanal\nWoodcraft',
       image: heroSlide3,
-      slideNumber: '03'
+      slideNumber: '03',
+      mobilePosition: '96% center'
     }
   ];
 
@@ -68,25 +71,30 @@ const Hero = ({ customSlides }) => {
 
   return (
     <section className="hero-wrapper" aria-label="Hero Spotlight">
-      {/* Slides Background */}
-      {slides.map((slide, index) => (
-        <div
-          key={slide.id || index}
-          className={`hero-slide ${index === currentSlide ? 'active' : ''}`}
-        >
-          <img
-            src={slide.image || heroSlide1}
-            alt={slide.title.replace('\n', ' ')}
-            className="hero-bg-img"
-            loading={index === 0 ? 'eager' : 'lazy'}
-          />
-          <div className="hero-gradient" />
-        </div>
-      ))}
+      {/* Slides Stage / Track */}
+      <div className="hero-slides-wrapper">
+        {slides.map((slide, index) => {
+          const mobilePos =
+            slide.mobilePosition ||
+            (index === 2 ? '96% center' : index === 1 ? '72% center' : '78% center');
 
-      {/* Hero Content Overlay */}
-      <div className="container hero-content-container">
-        {/* Top-Right Handcrafted Badge matching reference UI */}
+          return (
+            <div
+              key={slide.id || index}
+              className={`hero-slide ${index === currentSlide ? 'active' : ''}`}
+            >
+              <img
+                src={slide.image || heroSlide1}
+                alt={slide.title.replace('\n', ' ')}
+                className={`hero-bg-img hero-bg-img-${(index % 3) + 1}`}
+                loading={index === 0 ? 'eager' : 'lazy'}
+              />
+              <div className="hero-gradient" />
+            </div>
+          );
+        })}
+
+        {/* Handcrafted Badge positioned on the visual stage */}
         <div className="hero-handcrafted-badge">
           <div className="hero-handcrafted-line" />
           <div className="hero-handcrafted-text">
@@ -95,7 +103,10 @@ const Hero = ({ customSlides }) => {
             ))}
           </div>
         </div>
+      </div>
 
+      {/* Hero Editorial Content Stage */}
+      <div className="container hero-content-container">
         {/* Center-Left Editorial Typography & CTA */}
         <div className="hero-editorial-box">
           <div className="pre-heading white">
@@ -124,7 +135,7 @@ const Hero = ({ customSlides }) => {
           </Link>
         </div>
 
-        {/* Bottom Left Controls: "01 —— 03" with slider and circular arrow buttons */}
+        {/* Carousel Pagination & Arrows Controls */}
         <div className="hero-controls">
           <div className="hero-pagination">
             <span>0{currentSlide + 1}</span>

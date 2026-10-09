@@ -7,9 +7,9 @@ const JournalPage = () => {
     {
       id: 1,
       tag: 'CRAFT & HERITAGE',
-      title: 'The Art of Seasoned Walnut: Why Saharanpur Timbers Outlast Industrial Furniture',
+      title: 'The Art of Seasoned Walnut: Why Fine Artisan Timbers Outlast Industrial Furniture',
       excerpt:
-        'A rare glimpse into our 90-day natural kiln conditioning process in Uttar Pradesh, and how timber grain memory resists cracking over decades.',
+        'A rare glimpse into our 90-day natural kiln conditioning process, and how timber grain memory resists cracking over decades.',
       date: 'OCTOBER 2026',
       readTime: '6 MIN READ',
       image: '/uploads/hero-slide-1.jpg'

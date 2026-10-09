@@ -122,7 +122,7 @@ const ShopPage = () => {
           <span className="pre-heading">ARTISANAL COLLECTION</span>
           <h1 className="section-title">Considered Luminaires & Objects</h1>
           <p className="section-desc">
-            Explore handcrafted table lamps, arched floor fixtures, paper pendants, and seasoned Sheesham decorative objects made in Saharanpur.
+            Explore handcrafted table lamps, arched floor fixtures, paper pendants, and seasoned Sheesham decorative objects made for thoughtful living spaces.
           </p>
         </div>
       </section>

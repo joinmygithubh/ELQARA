@@ -50,13 +50,13 @@ const AboutPage = () => {
           <div>
             <span className="pre-heading">GENESIS & HERITAGE</span>
             <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '2.6rem', marginTop: '0.6rem', marginBottom: '1.25rem' }}>
-              The Woodturning Lineage of Saharanpur
+              The Lineage of Fine Woodturning
             </h2>
             <p style={{ fontSize: '0.98rem', lineHeight: 1.8, color: 'var(--text-body)', marginBottom: '1.25rem' }}>
-              Located in the foothills of northern India, <strong>Saharanpur</strong> in Uttar Pradesh is globally acknowledged as the historic epicentre of woodcarving. For four centuries, families in this craft corridor have passed down lathe techniques, woodturning gouges, and hand-carving chisels.
+              At ELQARA, we celebrate the enduring lineage of artisanal woodworking. Master craftspeople pass down lathe techniques, woodturning gouges, and hand-carving chisels to create timeless forms that honor raw materials.
             </p>
             <p style={{ fontSize: '0.98rem', lineHeight: 1.8, color: 'var(--text-body)', marginBottom: '2rem' }}>
-              ELQARA was established in Saharanpur to protect this ancestral craft from industrial obsolescence. By uniting traditional woodturners with minimalist architectural sensibilities, we create lamps that feel at home in Tokyo apartments, Scandinavian villas, and Indian sanctuaries alike.
+              ELQARA was established to celebrate this dedicated craft in the modern era. By uniting traditional woodturners with minimalist architectural sensibilities, we create lamps that feel at home in Tokyo apartments, Scandinavian villas, and contemporary sanctuaries alike.
             </p>
             <div style={{ display: 'flex', gap: '2rem' }}>
               <div>
@@ -114,7 +114,7 @@ const AboutPage = () => {
                 Generational Master Handiwork
               </h3>
               <p style={{ fontSize: '0.88rem', lineHeight: 1.7, color: 'var(--text-body)' }}>
-                Each curved mushroom shade, fluted bowl, and arc spine is shaped on manual lathes in Saharanpur. The natural grain differences make every single piece unique in the world.
+                Each curved mushroom shade, fluted bowl, and arc spine is shaped on manual lathes in our atelier. The natural grain differences make every single piece unique in the world.
               </p>
             </div>
 

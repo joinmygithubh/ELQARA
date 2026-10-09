@@ -285,7 +285,7 @@ const ProductDetailPage = () => {
               />
               {product.stock > 0 ? (
                 <span style={{ color: '#16A34A', fontWeight: 600 }}>
-                  Ready to Dispatch ({product.stock} units available at Saharanpur Atelier)
+                  Ready to Dispatch ({product.stock} units available in Atelier)
                 </span>
               ) : (
                 <span style={{ color: '#DC2626', fontWeight: 600 }}>
@@ -441,7 +441,7 @@ const ProductDetailPage = () => {
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
                 <Sparkles size={17} color="var(--accent-gold)" />
-                <span>Handcrafted Saharanpur Timber</span>
+                <span>Handcrafted Natural Timber</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
                 <RotateCcw size={17} color="var(--accent-gold)" />
@@ -471,7 +471,7 @@ const ProductDetailPage = () => {
                 }}
               >
                 {tab === 'specifications' && 'Architectural Specifications'}
-                {tab === 'craft' && 'Saharanpur Artisanship'}
+                {tab === 'craft' && 'Artisanal Craftsmanship'}
                 {tab === 'shipping' && 'White-Glove Shipping & Care'}
               </button>
             ))}
@@ -523,7 +523,7 @@ const ProductDetailPage = () => {
           {activeTab === 'craft' && (
             <div style={{ maxWidth: '780px', lineHeight: 1.8, fontSize: '0.95rem', color: 'var(--text-body)' }}>
               <p style={{ marginBottom: '1rem' }}>
-                Every ELQARA piece represents days of meticulous craft in Saharanpur, Uttar Pradesh. Our timbers are kiln-seasoned for over 90 days to achieve optimum moisture equilibrium, ensuring that the wood will never crack or warp under changing household climates.
+                Every ELQARA piece represents days of meticulous craft by master woodturners and artisans. Our timbers are kiln-seasoned for over 90 days to achieve optimum moisture equilibrium, ensuring that the wood will never crack or warp under changing household climates.
               </p>
               <p>
                 The gentle finish is hand-rubbed using natural bees-wax and cold-pressed linseed oils, preserving the living texture and tactile grain of the organic timber without artificial polyurethane coats.

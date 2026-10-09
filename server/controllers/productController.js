@@ -26,8 +26,9 @@ export const getProducts = async (req, res, next) => {
 
     const query = {};
 
-    // Filter by status (unless admin view is specifically requested by authorized admin)
-    if (!adminView) {
+    // Filter by status (admin view is strictly restricted to authenticated administrators)
+    const isAdminUser = req.user && req.user.role === 'admin';
+    if (!adminView || !isAdminUser) {
       query.status = 'active';
     }
 

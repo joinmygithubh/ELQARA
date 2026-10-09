@@ -23,11 +23,11 @@ const homepageSchema = new mongoose.Schema(
     },
     featuredCollectionTitle: {
       type: String,
-      default: 'The Saharanpur Heritage'
+      default: 'The Atelier Collection'
     },
     featuredCollectionSubtitle: {
       type: String,
-      default: 'Sculpted by generational woodturners and brass artisans in Uttar Pradesh.'
+      default: 'Sculpted by master woodturners and brass artisans.'
     }
   },
   {

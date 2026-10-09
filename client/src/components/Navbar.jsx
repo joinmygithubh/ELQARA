@@ -79,16 +79,28 @@ const Navbar = ({ onOpenSearch }) => {
         </div>
 
         {/* Main Navbar */}
-        <div className="container">
+        <div className="container nav-container">
           <nav className="nav-inner" aria-label="Main Navigation">
-            {/* Left: Brand Logo */}
+            {/* Left: Mobile Menu Hamburger (Visible on mobile, hidden on desktop) */}
+            <div className="nav-mobile-toggle-wrapper">
+              <button
+                type="button"
+                className="icon-btn mobile-menu-toggle"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                aria-label="Toggle mobile menu"
+              >
+                {isMobileMenuOpen ? <X size={20} strokeWidth={1.5} /> : <Menu size={20} strokeWidth={1.5} />}
+              </button>
+            </div>
+
+            {/* Center on mobile / Left on desktop: Brand Logo */}
             <Link to="/" className="brand-logo" aria-label="ELQARA Homepage">
               <span className="brand-name">ELQARA</span>
               <span className="brand-tagline">OBJECTS FOR LIVING</span>
             </Link>
 
             {/* Center: Desktop Navigation Links */}
-            <ul className="nav-links" style={{ display: 'flex' }}>
+            <ul className="nav-links">
               <li>
                 <NavLink
                   to="/"
@@ -280,7 +292,7 @@ const Navbar = ({ onOpenSearch }) => {
                 onClick={onOpenSearch}
                 aria-label="Search lamps and decor"
               >
-                <Search size={19} strokeWidth={1.5} />
+                <Search size={18} strokeWidth={1.5} />
               </button>
 
               {/* Vertical divider line */}
@@ -293,19 +305,19 @@ const Navbar = ({ onOpenSearch }) => {
                 onClick={openWishlist}
                 aria-label="View Wishlist"
               >
-                <Heart size={19} strokeWidth={1.5} />
+                <Heart size={18} strokeWidth={1.5} />
                 <span className="badge-count">{wishlistCount}</span>
               </button>
 
               {/* User Account Menu */}
-              <div style={{ position: 'relative' }}>
+              <div className="nav-account-wrapper" style={{ position: 'relative' }}>
                 <button
                   type="button"
                   className="icon-btn"
                   onClick={() => setIsAccountMenuOpen(!isAccountMenuOpen)}
                   aria-label="User Account"
                 >
-                  <User size={19} strokeWidth={1.5} />
+                  <User size={18} strokeWidth={1.5} />
                 </button>
 
                 {isAccountMenuOpen && (
@@ -400,20 +412,6 @@ const Navbar = ({ onOpenSearch }) => {
                         >
                           Sign In / Register
                         </Link>
-                        <div style={{ height: '1px', background: 'var(--border-hairline)', margin: '0.3rem 0' }} />
-                        <Link
-                          to="/admin/login"
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.5rem',
-                            padding: '0.6rem 1.25rem',
-                            fontSize: '0.78rem',
-                            color: 'var(--text-muted)'
-                          }}
-                        >
-                          <ShieldCheck size={14} /> Admin Access
-                        </Link>
                       </>
                     )}
                   </div>
@@ -427,19 +425,8 @@ const Navbar = ({ onOpenSearch }) => {
                 onClick={openCart}
                 aria-label="View Shopping Bag"
               >
-                <ShoppingBag size={19} strokeWidth={1.5} />
+                <ShoppingBag size={18} strokeWidth={1.5} />
                 <span className="badge-count">{itemCount}</span>
-              </button>
-
-              {/* Mobile Menu Hamburger */}
-              <button
-                type="button"
-                className="icon-btn mobile-menu-toggle"
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                style={{ display: 'none' }}
-                aria-label="Toggle mobile menu"
-              >
-                {isMobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
               </button>
             </div>
           </nav>
@@ -479,7 +466,7 @@ const Navbar = ({ onOpenSearch }) => {
               ))}
             </div>
             <Link to="/about" className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>
-              About Saharanpur Heritage
+              About Our Atelier
             </Link>
             <Link to="/journal" className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>
               Journal & Stories
@@ -487,20 +474,49 @@ const Navbar = ({ onOpenSearch }) => {
             <Link to="/contact" className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>
               Contact Atelier
             </Link>
+
+            {/* Mobile Drawer Account Links */}
+            <div style={{ marginTop: '0.5rem', paddingTop: '1rem', borderTop: '1px solid var(--border-medium)', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              {isAuthenticated ? (
+                <>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                    Signed in as <strong style={{ color: 'var(--text-main)' }}>{user?.name}</strong>
+                  </div>
+                  <Link to="/account" className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Package size={16} /> My Orders & Profile
+                  </Link>
+                  {isAdmin && (
+                    <Link to="/admin" className="nav-link" style={{ color: 'var(--accent-gold)' }} onClick={() => setIsMobileMenuOpen(false)}>
+                      <ShieldCheck size={16} /> Admin Portal
+                    </Link>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      padding: 0,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                      color: '#DC2626',
+                      fontSize: '0.85rem',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <LogOut size={16} /> Sign Out
+                  </button>
+                </>
+              ) : (
+                <Link to="/login" className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>
+                  <User size={16} /> Sign In / Register
+                </Link>
+              )}
+            </div>
           </div>
         )}
       </header>
-
-      <style>{`
-        @media (max-width: 900px) {
-          .nav-links {
-            display: none !important;
-          }
-          .mobile-menu-toggle {
-            display: flex !important;
-          }
-        }
-      `}</style>
     </>
   );
 };

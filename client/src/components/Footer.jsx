@@ -213,7 +213,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link to="/shop?category=home-decor" style={{ color: 'inherit', transition: 'color 150ms' }} onMouseEnter={(e) => (e.target.style.color = '#FFF')} onMouseLeave={(e) => (e.target.style.color = 'inherit')}>
-                  Saharanpur Home Decor
+                  Artisanal Home Decor
                 </Link>
               </li>
               <li>
@@ -258,11 +258,6 @@ const Footer = () => {
               <li>
                 <Link to="/account" style={{ color: 'inherit' }} onMouseEnter={(e) => (e.target.style.color = '#FFF')} onMouseLeave={(e) => (e.target.style.color = 'inherit')}>
                   Track Your Order
-                </Link>
-              </li>
-              <li>
-                <Link to="/admin" style={{ color: 'rgba(250, 247, 242, 0.45)', fontSize: '0.75rem' }}>
-                  Admin Portal
                 </Link>
               </li>
             </ul>
@@ -342,7 +337,7 @@ const Footer = () => {
           }}
         >
           <div>
-            © {new Date().getFullYear()} ELQARA — Objects for Living. All rights reserved. Handcrafted with reverence in Saharanpur, India.
+            © {new Date().getFullYear()} ELQARA — Objects for Living. All rights reserved. Handcrafted with reverence.
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flexWrap: 'wrap' }}>

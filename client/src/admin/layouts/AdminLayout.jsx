@@ -142,7 +142,7 @@ const AdminLayout = () => {
         {/* Top Bar */}
         <header className="admin-topbar">
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-            <span>Saharanpur Atelier</span>
+            <span>ELQARA Atelier</span>
             <ChevronRight size={13} />
             <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Administration Portal</span>
           </div>

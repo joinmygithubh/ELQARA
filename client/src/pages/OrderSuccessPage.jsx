@@ -73,7 +73,7 @@ const OrderSuccessPage = () => {
             Thank You, {order?.customer?.name || 'Collector'}
           </h1>
           <p style={{ color: 'var(--text-body)', fontSize: '1rem', lineHeight: 1.6, maxWidth: '520px', margin: '0 auto 1.5rem' }}>
-            Your order <strong>#{order?.orderNumber || orderNumber}</strong> has been transmitted to our Saharanpur workshop. Our artisans are hand-inspecting and preparing your edition.
+            Your order <strong>#{order?.orderNumber || orderNumber}</strong> has been transmitted to our atelier workshop. Our artisans are hand-inspecting and preparing your edition.
           </p>
 
           <div style={{ display: 'inline-flex', gap: '1rem' }}>

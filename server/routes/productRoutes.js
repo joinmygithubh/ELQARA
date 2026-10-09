@@ -8,12 +8,12 @@ import {
   deleteProduct,
   toggleProductStatus
 } from '../controllers/productController.js';
-import { protect, adminOnly } from '../middleware/auth.js';
+import { protect, adminOnly, optionalAuth } from '../middleware/auth.js';
 
 const router = express.Router();
 
 // Public routes
-router.get('/', getProducts);
+router.get('/', optionalAuth, getProducts);
 router.get('/slug/:slug', getProductBySlug);
 router.get('/:id', getProductById);
 

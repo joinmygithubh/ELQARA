@@ -47,6 +47,14 @@ const userSchema = new mongoose.Schema(
     isBlocked: {
       type: Boolean,
       default: false
+    },
+    resetPasswordToken: {
+      type: String,
+      select: false
+    },
+    resetPasswordExpire: {
+      type: Date,
+      select: false
     }
   },
   {

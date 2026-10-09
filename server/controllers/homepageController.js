@@ -35,7 +35,7 @@ export const getHomepageSettings = async (req, res, next) => {
             subtitle: 'Elevate expansive living rooms with solid walnut arcs and hand-blown opaline diffusers.',
             buttonText: 'VIEW FLOOR LAMPS',
             buttonLink: '/shop?category=floor-lamps',
-            badgeText: 'Saharanpur Craft',
+            badgeText: 'Artisanal Woodcraft',
             image: '/uploads/hero-slide-3.jpg',
             slideNumber: '03'
           }

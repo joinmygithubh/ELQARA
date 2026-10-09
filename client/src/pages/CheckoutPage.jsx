@@ -33,7 +33,7 @@ const CheckoutPage = () => {
     street: user?.addresses?.[0]?.street || '',
     landmark: user?.addresses?.[0]?.landmark || '',
     city: user?.addresses?.[0]?.city || '',
-    state: user?.addresses?.[0]?.state || 'Uttar Pradesh',
+    state: user?.addresses?.[0]?.state || 'Delhi',
     pincode: user?.addresses?.[0]?.pincode || '',
     notes: '',
     paymentMethod: 'COD'
@@ -625,7 +625,7 @@ const CheckoutPage = () => {
               </button>
 
               <div style={{ marginTop: '1.25rem', textAlign: 'center', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                By placing this order, you support generational woodturning artisans in Saharanpur, UP.
+                By placing this order, you support generational woodturning master artisans.
               </div>
             </div>
           </div>

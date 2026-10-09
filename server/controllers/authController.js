@@ -1,5 +1,7 @@
+import crypto from 'node:crypto';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
+import { sendPasswordResetNotification } from '../services/emailService.js';
 
 const generateToken = (id) => {
   const jwtSecret = process.env.JWT_SECRET;
@@ -206,40 +208,58 @@ export const updateProfile = async (req, res, next) => {
   }
 };
 
-// @desc    Forgot password simulation
+// @desc    Request password reset with verification code
 // @route   POST /api/auth/forgot-password
 // @access  Public
 export const forgotPassword = async (req, res, next) => {
   try {
     const { email } = req.body;
-    if (!email) {
+    if (!email || typeof email !== 'string' || !email.includes('@')) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide your registered email address'
+        message: 'Please provide a valid registered email address'
       });
     }
-    const user = await User.findOne({ email: email.toLowerCase() });
 
-    // Always return success message for security with helpful prompt
+    const user = await User.findOne({ email: email.toLowerCase().trim() });
+    if (user) {
+      // Generate secure 6-digit numeric verification code
+      const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
+      const hashedCode = crypto.createHash('sha256').update(resetCode).digest('hex');
+
+      user.resetPasswordToken = hashedCode;
+      user.resetPasswordExpire = new Date(Date.now() + 15 * 60 * 1000); // 15-minute expiration
+      await user.save();
+
+      try {
+        await sendPasswordResetNotification({ email: user.email, name: user.name }, resetCode);
+      } catch (emailErr) {
+        console.error('[authController] Failed to send reset email:', emailErr.message);
+      }
+    }
+
+    // Always return safe generic success message to prevent user enumeration
     res.json({
       success: true,
-      message: 'Password reset instructions have been dispatched to your email address.'
+      message: 'If an account exists with this email, a 6-digit verification code has been dispatched.'
     });
   } catch (error) {
     next(error);
   }
 };
 
-// @desc    Reset password
+// @desc    Reset password with verified code
 // @route   POST /api/auth/reset-password
 // @access  Public
 export const resetPassword = async (req, res, next) => {
   try {
-    const { email, newPassword } = req.body;
-    if (!email || !newPassword) {
+    const { email, resetCode, code, token, newPassword } = req.body;
+    const verificationCode = (resetCode || code || token || '').toString().trim();
+
+    if (!email || !verificationCode || !newPassword) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide both email and new password'
+        message: 'Please provide email, verification code, and new password'
       });
     }
 
@@ -250,15 +270,24 @@ export const resetPassword = async (req, res, next) => {
       });
     }
 
-    const user = await User.findOne({ email: email.toLowerCase() });
+    const hashedCode = crypto.createHash('sha256').update(verificationCode).digest('hex');
+
+    const user = await User.findOne({
+      email: email.toLowerCase().trim(),
+      resetPasswordToken: hashedCode,
+      resetPasswordExpire: { $gt: new Date() }
+    }).select('+resetPasswordToken +resetPasswordExpire');
+
     if (!user) {
-      return res.status(404).json({
+      return res.status(400).json({
         success: false,
-        message: 'No account found with this email address'
+        message: 'Invalid or expired verification code. Please request a new code.'
       });
     }
 
     user.password = newPassword;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
     await user.save();
 
     res.json({

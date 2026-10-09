@@ -13,6 +13,7 @@ const AuthPage = () => {
     email: '',
     password: '',
     phone: '',
+    resetCode: '',
     newPassword: '',
     confirmPassword: ''
   });
@@ -61,8 +62,8 @@ const AuthPage = () => {
           setMode('reset');
         }
       } else if (mode === 'reset') {
-        if (!formData.email || !formData.newPassword) {
-          showToast('Please fill all fields', 'error');
+        if (!formData.email || !formData.resetCode || !formData.newPassword) {
+          showToast('Please provide your verification code and new password', 'error');
           setLoading(false);
           return;
         }
@@ -78,12 +79,13 @@ const AuthPage = () => {
         }
         const res = await authAPI.resetPassword({
           email: formData.email,
+          resetCode: formData.resetCode.trim(),
           newPassword: formData.newPassword
         });
         if (res.data?.success) {
           showToast(res.data.message, 'success');
           setMode('login');
-          setFormData((prev) => ({ ...prev, password: '' }));
+          setFormData((prev) => ({ ...prev, password: '', resetCode: '', newPassword: '', confirmPassword: '' }));
         }
       }
     } catch (err) {
@@ -251,6 +253,33 @@ const AuthPage = () => {
             <>
               <div>
                 <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: '0.4rem' }}>
+                  6-Digit Verification Code *
+                </label>
+                <div style={{ position: 'relative' }}>
+                  <KeyRound size={16} color="var(--text-muted)" style={{ position: 'absolute', top: '13px', left: '12px' }} />
+                  <input
+                    type="text"
+                    name="resetCode"
+                    required
+                    maxLength={6}
+                    placeholder="Enter 6-digit code sent to your email"
+                    value={formData.resetCode}
+                    onChange={handleChange}
+                    style={{
+                      width: '100%',
+                      padding: '0.75rem 0.75rem 0.75rem 2.4rem',
+                      border: '1px solid var(--border-medium)',
+                      borderRadius: 'var(--radius-xs)',
+                      outline: 'none',
+                      letterSpacing: '0.15em',
+                      fontWeight: 600
+                    }}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: '0.4rem' }}>
                   New Password *
                 </label>
                 <div style={{ position: 'relative' }}>
@@ -358,24 +387,6 @@ const AuthPage = () => {
               </button>
             </div>
           )}
-        </div>
-
-        {/* Demo Credentials Helper for Quick Evaluation */}
-        <div
-          style={{
-            marginTop: '2rem',
-            padding: '1rem',
-            backgroundColor: '#FAF7F2',
-            borderRadius: 'var(--radius-xs)',
-            fontSize: '0.78rem',
-            color: 'var(--text-body)',
-            border: '1px dashed var(--border-medium)'
-          }}
-        >
-          <strong>Demo Customer:</strong> arjun.sharma@example.com / CustomerPass@123<br />
-          <Link to="/admin/login" style={{ color: 'var(--accent-gold)', textDecoration: 'underline', marginTop: '4px', display: 'inline-block' }}>
-            Switch to Admin Portal Login →
-          </Link>
         </div>
       </div>
     </div>

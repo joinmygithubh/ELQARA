@@ -170,7 +170,7 @@ export const createOrder = async (req, res, next) => {
 
 // @desc    Get order details by ID or Order Number
 // @route   GET /api/orders/:id
-// @access  Public
+// @access  Protected for registered orders / Public for matching guest order confirmation
 export const getOrderById = async (req, res, next) => {
   try {
     const isObjectId = req.params.id.match(/^[0-9a-fA-F]{24}$/);
@@ -182,6 +182,35 @@ export const getOrderById = async (req, res, next) => {
         success: false,
         message: 'Order not found'
       });
+    }
+
+    // Security & Data Isolation Check (Customers cannot access other customers' orders)
+    if (order.user) {
+      if (!req.user) {
+        return res.status(401).json({
+          success: false,
+          message: 'Authentication required to access this order'
+        });
+      }
+      const isOwner = req.user._id.toString() === order.user.toString();
+      const isAdmin = req.user.role === 'admin';
+      if (!isOwner && !isAdmin) {
+        return res.status(403).json({
+          success: false,
+          message: 'Access denied: You are not authorized to view this order'
+        });
+      }
+    } else {
+      // Guest order verification: if requester is logged in as another user, prevent access
+      if (req.user && req.user.role !== 'admin') {
+        const matchesEmail = req.user.email?.toLowerCase() === order.customer?.email?.toLowerCase();
+        if (!matchesEmail) {
+          return res.status(403).json({
+            success: false,
+            message: 'Access denied: You are not authorized to view this order'
+          });
+        }
+      }
     }
 
     res.json({

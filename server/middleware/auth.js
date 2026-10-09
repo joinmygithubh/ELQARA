@@ -55,3 +55,28 @@ export const adminOnly = (req, res, next) => {
     });
   }
 };
+
+export const optionalAuth = async (req, res, next) => {
+  let token;
+  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+    token = req.headers.authorization.split(' ')[1];
+  }
+
+  if (!token) {
+    return next();
+  }
+
+  try {
+    const jwtSecret = process.env.JWT_SECRET;
+    if (jwtSecret) {
+      const decoded = jwt.verify(token, jwtSecret);
+      const user = await User.findById(decoded.id).select('-password');
+      if (user && !user.isBlocked) {
+        req.user = user;
+      }
+    }
+  } catch {
+    // Optional token decoding failed, proceed as unauthenticated
+  }
+  next();
+};

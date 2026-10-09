@@ -165,7 +165,7 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* 5. ARTISAN HERITAGE SPOTLIGHT — SAHARANPUR MASTERY */}
+      {/* 5. ATELIER STORY — CRAFTED WITH INTENTION */}
       <section
         style={{
           backgroundColor: 'var(--bg-dark)',
@@ -196,17 +196,27 @@ const HomePage = () => {
                   marginBottom: '1.5rem'
                 }}
               >
-                Rooted in Saharanpur. Crafted for Modern Life.
+                Crafted with Intention. Designed for Living.
               </h2>
               <p
                 style={{
                   fontSize: '1rem',
                   lineHeight: 1.8,
                   color: 'rgba(250, 247, 242, 0.8)',
-                  marginBottom: '1.5rem'
+                  marginBottom: '1.25rem'
                 }}
               >
-                For over four centuries, the city of Saharanpur in northern India has been celebrated as the global cradle of artisanal woodcarving and fine turnery. Every ELQARA lamp is born here — in our woodturning atelier — where generational master woodturners shape sustainably sourced walnut, teak, and Sheesham timber by eye and touch.
+                At ELQARA, we believe exceptional design lies in the details. Every piece is thoughtfully created to bring warmth, character, and quiet sophistication into your home.
+              </p>
+              <p
+                style={{
+                  fontSize: '0.95rem',
+                  lineHeight: 1.8,
+                  color: 'rgba(250, 247, 242, 0.75)',
+                  marginBottom: '1.25rem'
+                }}
+              >
+                Our collection brings together the natural beauty of fine wood, the enduring elegance of aged brass, and the delicate clarity of hand-finished glass. Balanced forms, rich textures, and warm 2700K ambient lighting transform everyday spaces into inviting, considered environments.
               </p>
               <p
                 style={{
@@ -216,7 +226,7 @@ const HomePage = () => {
                   marginBottom: '2.5rem'
                 }}
               >
-                We unite this irreplaceable heritage craft with heavy aged brass, hand-blown borosilicate glass, and soothing 2700K ambient LED technology.
+                Rooted in timeless aesthetics and guided by modern sensibilities, ELQARA creates lighting and home décor that go beyond function — bringing atmosphere, individuality, and lasting beauty to the spaces you call home.
               </p>
 
               <div style={{ display: 'flex', gap: '2rem', marginBottom: '2.5rem' }}>
@@ -226,13 +236,13 @@ const HomePage = () => {
                 </div>
                 <div style={{ width: '1px', background: 'rgba(255,255,255,0.1)' }} />
                 <div>
-                  <div style={{ fontFamily: 'var(--font-serif)', fontSize: '2.4rem', color: 'var(--accent-gold)' }}>400+</div>
-                  <div style={{ fontSize: '0.8rem', color: 'rgba(250,247,242,0.65)' }}>Years of Wood Craft Lineage</div>
+                  <div style={{ fontFamily: 'var(--font-serif)', fontSize: '2.4rem', color: 'var(--accent-gold)' }}>2700K</div>
+                  <div style={{ fontSize: '0.8rem', color: 'rgba(250,247,242,0.65)' }}>Warm Ambient Illumination</div>
                 </div>
               </div>
 
               <Link to="/about" className="btn-primary">
-                <span>Discover Our Heritage</span>
+                <span>Discover Our Story</span>
                 <ArrowRight size={16} />
               </Link>
             </div>
@@ -248,7 +258,7 @@ const HomePage = () => {
               >
                 <img
                   src="/uploads/hero-slide-1.jpg"
-                  alt="Saharanpur Wood Lamp Craftsmanship"
+                  alt="ELQARA Handcrafted Wood Lamp"
                   style={{ width: '100%', height: '520px', objectFit: 'cover' }}
                 />
               </div>
@@ -272,7 +282,7 @@ const HomePage = () => {
                   "We don't merely turn timber into lamps; we sculpt light into a companion for the home."
                 </p>
                 <span style={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--accent-gold)' }}>
-                  — Master Artisan, Saharanpur Atelier
+                  — Master Artisan, ELQARA Atelier
                 </span>
               </div>
             </div>
@@ -377,7 +387,7 @@ const HomePage = () => {
         <div className="container">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '3rem', flexWrap: 'wrap', gap: '1rem' }}>
             <div>
-              <span className="pre-heading">FRESH FROM SAHARANPUR</span>
+              <span className="pre-heading">FRESH FROM THE ATELIER</span>
               <h2 className="section-title">New Arrivals</h2>
             </div>
             <Link to="/shop?newArrival=true" className="btn-outline">
@@ -478,7 +488,7 @@ const HomePage = () => {
               },
               {
                 quote:
-                  'Knowing this piece was carved by master artisans in Saharanpur gives it soul. The brass toggle switch feels wonderfully tactile. Customer delivery was flawless.',
+                  'Knowing this piece was crafted with such intention by master artisans gives it soul. The brass toggle switch feels wonderfully tactile. Customer delivery was flawless.',
                 author: 'Ananya Pillai',
                 title: 'Collector, Bengaluru',
                 rating: 5

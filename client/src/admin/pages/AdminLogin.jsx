@@ -5,8 +5,8 @@ import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 
 const AdminLogin = () => {
-  const [email, setEmail] = useState('admin@elqara.com');
-  const [password, setPassword] = useState('ElqaraAdmin@2026');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
   const { adminLogin } = useAuth();
@@ -89,6 +89,7 @@ const AdminLogin = () => {
               <input
                 type="email"
                 required
+                placeholder="admin@elqara.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 style={{
@@ -113,6 +114,7 @@ const AdminLogin = () => {
               <input
                 type="password"
                 required
+                placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 style={{

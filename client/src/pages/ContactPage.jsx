@@ -791,7 +791,7 @@ const ContactPage = () => {
                     marginBottom: '1.75rem'
                   }}
                 >
-                  We partner closely with design studios, hoteliers, and procurement managers worldwide. Custom adaptations, timber seasoning specs, and volume fabrication are executed directly from our Saharanpur workshops.
+                  We partner closely with design studios, hoteliers, and procurement managers worldwide. Custom adaptations, timber seasoning specs, and volume fabrication are executed directly from our atelier workshops.
                 </p>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.35rem', fontSize: '0.9rem' }}>

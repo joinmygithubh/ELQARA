@@ -207,7 +207,7 @@ export const buildEnquiryEmailHtml = (enquiry) => {
                     <span style="font-family: Georgia, serif; font-size: 12px; color: #8C5338; font-weight: bold;">
                       ELQARA ATELIER
                     </span><br>
-                    Saharanpur, Uttar Pradesh
+                    Objects for Living
                   </td>
                 </tr>
               </table>
@@ -427,4 +427,113 @@ export const sendEnquiryNotification = async (enquiry) => {
       destination: destinationEmail
     };
   }
+};
+
+/**
+ * Send password reset verification code to customer
+ */
+export const sendPasswordResetNotification = async (recipient, resetCode) => {
+  const fromEmail = process.env.EMAIL_FROM || DEFAULT_SENDER;
+  const userEmail = recipient.email;
+  const userName = escapeHtml(recipient.name || 'Valued Collector');
+  const safeCode = escapeHtml(resetCode);
+
+  const subject = 'ELQARA — Your Password Reset Verification Code';
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>${subject}</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #FAF7F2; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1C1917;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="padding: 32px 16px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width: 540px; background-color: #FFFFFF; border-radius: 6px; overflow: hidden; border: 1px solid #E7E3DA; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);">
+          <tr>
+            <td style="background-color: #1C1B18; padding: 32px 28px; text-align: center; border-bottom: 3px solid #C4704F;">
+              <span style="font-family: Georgia, serif; font-size: 26px; letter-spacing: 0.18em; color: #FAF7F2; text-transform: uppercase;">
+                ELQARA
+              </span>
+              <span style="display: block; font-size: 10px; letter-spacing: 0.28em; text-transform: uppercase; color: #C4704F; margin-top: 6px; font-weight: 600;">
+                Objects for Living • Security
+              </span>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 32px 28px 20px;">
+              <h1 style="font-family: Georgia, serif; font-size: 20px; font-weight: 400; color: #1C1917; margin: 0 0 12px;">
+                Password Reset Request
+              </h1>
+              <p style="font-size: 14px; line-height: 1.6; color: #57534E; margin: 0 0 20px;">
+                Dear ${userName}, we received a request to reset your ELQARA collector account password. Use the verification code below to authorize your password update.
+              </p>
+              <div style="background-color: #FAF7F2; border: 1px solid #ECE7DE; border-radius: 6px; padding: 20px; text-align: center; margin: 24px 0;">
+                <span style="display: block; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: #8C5338; font-weight: 700; margin-bottom: 8px;">
+                  Your Verification Code
+                </span>
+                <span style="font-family: monospace; font-size: 32px; font-weight: 700; letter-spacing: 0.25em; color: #1C1917;">
+                  ${safeCode}
+                </span>
+                <span style="display: block; font-size: 12px; color: #A8A29E; margin-top: 8px;">
+                  Valid for 15 minutes only
+                </span>
+              </div>
+              <p style="font-size: 12px; line-height: 1.5; color: #78716C; margin: 0;">
+                If you did not initiate this request, you can safely disregard this message. Your password will remain unchanged.
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="background-color: #F7F4EE; padding: 16px 28px; border-top: 1px solid #ECE7DE; font-size: 11px; color: #A8A29E; text-align: center;">
+              ELQARA Atelier • Objects for Living
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+
+  const text = `ELQARA — Password Reset Verification Code\n\nDear ${userName},\n\nYour 6-digit verification code is: ${safeCode}\n\nThis code is valid for 15 minutes.\nIf you did not request this, please ignore this email.\n\nELQARA Atelier`;
+
+  const resendKey = process.env.RESEND_API_KEY || process.env.EMAIL_API_KEY;
+
+  if (resendKey) {
+    try {
+      const response = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${resendKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          from: fromEmail,
+          to: [userEmail],
+          subject,
+          html,
+          text
+        })
+      });
+
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        console.error('[EmailService:ResetPassword Resend Error]:', data);
+        throw new Error(`Resend password reset delivery failed: ${data?.message || response.statusText}`);
+      }
+
+      return { success: true, provider: 'resend', id: data.id };
+    } catch (err) {
+      console.error('[EmailService:ResetPassword Exception]:', err.message);
+      throw err;
+    }
+  }
+
+  // Fallback for development simulation
+  console.log('----------------------------------------------------');
+  console.log(`[EmailService: Password Reset Simulation] Code for ${userEmail}: [${safeCode}]`);
+  console.log('----------------------------------------------------');
+  return { success: true, simulated: true };
 };

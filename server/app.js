@@ -26,13 +26,25 @@ const app = express();
 // Trust Cloudflare and reverse proxies for client IP detection
 app.set('trust proxy', true);
 
-// Body Parsing Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Standard security headers (Cloudflare Workers & Node.js compatible)
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  next();
+});
+
+// Body Parsing Middleware (with size limits for safety)
+app.use(express.json({ limit: '1mb' }));
+app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 
 // Production and local development allowed CORS origins
 const allowedOrigins = [
   'https://0f4cede7.elqara.pages.dev',
+  'https://elqara.pages.dev',
+  'https://elqara.com',
+  'https://www.elqara.com',
   'http://localhost:5173',
   'http://localhost:3000',
   'http://127.0.0.1:5173'
