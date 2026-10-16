@@ -2482,32 +2482,32 @@ const seedDatabase = async () => {
         heroSlides: [
           {
             preheading: 'PREMIUM HOME DÉCOR & LIGHTING',
-            title: 'Crafted forms.\nConsidered spaces.',
-            subtitle: 'Discover handcrafted lighting and décor that brings warmth, character and calm to your space.',
+            title: 'Timeless Decor\nfor Modern Spaces',
+            subtitle: 'Explore handcrafted home décor and lighting that bring warmth, character and elegance to your everyday spaces.',
             buttonText: 'EXPLORE COLLECTION',
             buttonLink: '/shop',
             badgeText: 'Handcrafted in India',
-            image: '/uploads/hero-slide-1.jpg',
+            image: '/uploads/hero-banner-editorial.png',
             slideNumber: '01'
           },
           {
             preheading: 'ARCHITECTURAL ILLUMINATION',
-            title: 'Subtle warmth.\nTimeless glass.',
-            subtitle: 'Fluted amber crystal and brushed brass that infuse every corner with gentle, considered radiance.',
+            title: 'Subtle warmth.\nTimeless stone.',
+            subtitle: 'Hand-sculpted travertine forms and organic woven linen that infuse every room with gentle, considered radiance.',
             buttonText: 'DISCOVER LAMPS',
             buttonLink: '/shop?category=table-lamps',
-            badgeText: 'Artisanal Brasswork',
-            image: '/uploads/hero-slide-2.jpg',
+            badgeText: 'Natural Travertine',
+            image: '/uploads/hero-slide-travertine.png',
             slideNumber: '02'
           },
           {
             preheading: 'SCULPTURAL LIVING',
-            title: 'Graceful arcs.\nEffortless calm.',
-            subtitle: 'Elevate expansive living rooms with solid walnut arcs and hand-blown opaline diffusers.',
-            buttonText: 'VIEW FLOOR LAMPS',
-            buttonLink: '/shop?category=floor-lamps',
+            title: 'Fluted textures.\nQuiet luxury.',
+            subtitle: 'Precision-fluted seasoned hardwood and natural stone console textures crafted for serene modern sanctuaries.',
+            buttonText: 'EXPLORE EDITIONS',
+            buttonLink: '/shop',
             badgeText: 'Artisanal Woodcraft',
-            image: '/uploads/hero-slide-3.jpg',
+            image: '/uploads/hero-slide-fluted.png',
             slideNumber: '03'
           }
         ],

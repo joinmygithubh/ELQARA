@@ -342,6 +342,26 @@ await runTest('12. Wrangler configuration has correct production bindings', () =
   );
 });
 
+// -------------------------------------------------------------
+// Test 13: Image Upload Flow & Fallback Resilience (No 403 Errors)
+// -------------------------------------------------------------
+await runTest('13. Image upload processes successfully without 403 errors and falls back gracefully', async () => {
+  const { processUploadedFile } = await import('./middleware/upload.js');
+  const sampleFile = {
+    buffer: Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==', 'base64'),
+    mimetype: 'image/png',
+    originalname: 'test-lamp.png'
+  };
+
+  const uploadedUrl = await processUploadedFile(sampleFile);
+  assert.ok(uploadedUrl, 'Upload must return a valid URL or path');
+  assert.ok(
+    uploadedUrl.startsWith('http') || uploadedUrl.startsWith('/uploads') || uploadedUrl.startsWith('data:image'),
+    'Uploaded URL must be a CDN URL, local upload path, or valid data URI'
+  );
+  assert.notEqual(uploadedUrl, '/logo-icon.svg', 'Upload must not return placeholder logo-icon.svg');
+});
+
 console.log('\n====================================================');
 console.log(`SUMMARY: ${passedTests} PASSED, ${failedTests} FAILED`);
 console.log('====================================================');

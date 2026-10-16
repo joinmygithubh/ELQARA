@@ -8,6 +8,7 @@
     "start": "node server.js",
     "dev": "node --watch server.js",
     "seed": "node seed/seed.js",
+    "create-admin": "node scripts/createAdmin.js",
     "build:worker": "wrangler deploy --dry-run",
     "deploy:worker": "wrangler deploy"
   },

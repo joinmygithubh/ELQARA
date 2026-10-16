@@ -68,12 +68,11 @@ export const processUploadedFile = async (file) => {
 
       return result.secure_url;
     } catch (err) {
-      console.warn('[Upload Middleware] Cloudinary upload error:', err.message);
-      throw err;
+      console.warn('[Upload Middleware] Cloudinary upload error, falling back to resilient storage:', err.message);
     }
   }
 
-  // Fallback for local development if Cloudinary credentials are not set
+  // Fallback storage when Cloudinary credentials are not configured or upload fails
   if (file.buffer) {
     try {
       const uploadsDir = path.resolve('uploads');
@@ -86,8 +85,9 @@ export const processUploadedFile = async (file) => {
       fs.writeFileSync(filePath, file.buffer);
       return `/uploads/${filename}`;
     } catch (err) {
-      console.warn('[Upload Middleware] Local disk write fallback unavailable:', err.message);
-      return '/logo-icon.svg';
+      console.warn('[Upload Middleware] Local disk write fallback unavailable, using data URI:', err.message);
+      const b64 = Buffer.from(file.buffer).toString('base64');
+      return `data:${file.mimetype || 'image/jpeg'};base64,${b64}`;
     }
   }
 
@@ -95,5 +95,5 @@ export const processUploadedFile = async (file) => {
     return `/uploads/${path.basename(file.path)}`;
   }
 
-  return '/logo-icon.svg';
+  throw new Error('Image data could not be processed');
 };

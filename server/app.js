@@ -36,8 +36,8 @@ app.use((req, res, next) => {
 });
 
 // Body Parsing Middleware (with size limits for safety)
-app.use(express.json({ limit: '1mb' }));
-app.use(express.urlencoded({ extended: true, limit: '1mb' }));
+app.use(express.json({ limit: '15mb' }));
+app.use(express.urlencoded({ extended: true, limit: '15mb' }));
 
 // Production and local development allowed CORS origins
 const allowedOrigins = [
