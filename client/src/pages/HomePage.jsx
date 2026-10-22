@@ -4,9 +4,13 @@ import { ArrowRight, Sparkles, ShieldCheck, Flame, Compass, Star, ArrowUpRight }
 import Hero from '../components/Hero';
 import FeaturesBar from '../components/FeaturesBar';
 import ProductCard from '../components/ProductCard';
+import ProductCardSkeleton from '../components/ProductCardSkeleton';
 import QuickViewModal from '../components/QuickViewModal';
 import { productAPI, categoryAPI, homepageAPI } from '../services/api';
 import { useCurrency } from '../context/CurrencyContext';
+import heroBannerEditorial from '../assets/hero-banner-editorial.png';
+import heroSlideTravertine from '../assets/hero-slide-travertine.png';
+import heroSlideFluted from '../assets/hero-slide-fluted.png';
 
 const HomePage = () => {
   const { formatPrice } = useCurrency();
@@ -154,13 +158,19 @@ const HomePage = () => {
           </div>
 
           <div className="product-grid">
-            {featuredProducts.map((product) => (
-              <ProductCard
-                key={product._id}
-                product={product}
-                onQuickView={setQuickViewProduct}
-              />
-            ))}
+            {loading ? (
+              [...Array(4)].map((_, i) => (
+                <ProductCardSkeleton key={`home-feat-skel-${i}`} />
+              ))
+            ) : (
+              featuredProducts.map((product) => (
+                <ProductCard
+                  key={product._id}
+                  product={product}
+                  onQuickView={setQuickViewProduct}
+                />
+              ))
+            )}
           </div>
         </div>
       </section>
@@ -257,7 +267,7 @@ const HomePage = () => {
                 }}
               >
                 <img
-                  src="/uploads/hero-slide-1.jpg"
+                  src={heroSlideFluted}
                   alt="ELQARA Handcrafted Wood Lamp"
                   style={{ width: '100%', height: '520px', objectFit: 'cover' }}
                 />
@@ -323,7 +333,7 @@ const HomePage = () => {
               }}
             >
               <img
-                src="/uploads/hero-slide-1.jpg"
+                src={heroSlideTravertine}
                 alt="Room ambience test"
                 style={{
                   width: '100%',
@@ -437,8 +447,71 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* 9. PROMOTIONAL ATELIER PRIVILEGE BANNER */}
-      <section style={{ backgroundColor: 'var(--bg-secondary)', padding: '5rem 0', borderTop: '1px solid var(--border-hairline)', borderBottom: '1px solid var(--border-hairline)' }}>
+      {/* 9. ATELIER LOOKBOOK — ARCHITECTURAL SPACES & CONSIDERED LIVING */}
+      <section className="section-spacing atelier-showcase-section" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+        <div className="container">
+          <div className="section-header-wrap">
+            <span className="pre-heading">ATELIER LOOKBOOK</span>
+            <h2 className="section-title">Designed for Considered Spaces</h2>
+            <p className="section-desc">
+              Every ELQARA luminaire is conceived as an architectural dialogue between raw, natural materials and gentle illumination.
+            </p>
+          </div>
+
+          <div className="atelier-showcase-grid">
+            {/* Showcase Card 1 - Image 2: Travertine Lamp */}
+            <div className="atelier-showcase-card">
+              <div className="atelier-showcase-img-wrap">
+                <img
+                  src={heroSlideTravertine}
+                  alt="ELQARA Travertine Hourglass Table Lamp in Living Space"
+                  className="atelier-showcase-img"
+                  loading="lazy"
+                />
+                <div className="atelier-showcase-badge">01 / TRAVERTINE EDITION</div>
+              </div>
+              <div className="atelier-showcase-info">
+                <div className="atelier-showcase-meta">Sculpted Stone & Linen • 2700K Warm Ambient</div>
+                <h3 className="atelier-showcase-title">The Hourglass Travertine Table Lamp</h3>
+                <p className="atelier-showcase-desc">
+                  Hand-carved from solid natural travertine stone with brushed brass hardware and tailored natural linen shade. Pictured alongside textured bouclé seating in warm ambient morning light.
+                </p>
+                <Link to="/shop?category=table-lamps" className="atelier-showcase-link">
+                  <span>Explore Table Lamps</span>
+                  <ArrowRight size={15} />
+                </Link>
+              </div>
+            </div>
+
+            {/* Showcase Card 2 - Image 3: Fluted Lamp */}
+            <div className="atelier-showcase-card reverse">
+              <div className="atelier-showcase-info">
+                <div className="atelier-showcase-meta">Seasoned Hardwood & Brass • Architectural Console</div>
+                <h3 className="atelier-showcase-title">The Fluted Column Wood Lamp</h3>
+                <p className="atelier-showcase-desc">
+                  Precision-milled fluted column base in seasoned natural timber, paired with a travertine architectural console, hardcover design volumes, and dried botanical sprigs.
+                </p>
+                <Link to="/shop" className="atelier-showcase-link">
+                  <span>Discover Collection</span>
+                  <ArrowRight size={15} />
+                </Link>
+              </div>
+              <div className="atelier-showcase-img-wrap">
+                <img
+                  src={heroSlideFluted}
+                  alt="ELQARA Fluted Wood Column Lamp on Console"
+                  className="atelier-showcase-img"
+                  loading="lazy"
+                />
+                <div className="atelier-showcase-badge">02 / FLUTED EDITION</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 10. PROMOTIONAL ATELIER PRIVILEGE BANNER */}
+      <section style={{ backgroundColor: 'var(--bg-primary)', padding: '5rem 0', borderTop: '1px solid var(--border-hairline)', borderBottom: '1px solid var(--border-hairline)' }}>
         <div className="container" style={{ maxWidth: '900px', textAlign: 'center' }}>
           <span className="pre-heading" style={{ justifyContent: 'center' }}>
             ATELIER INAUGURATION PRIVILEGE

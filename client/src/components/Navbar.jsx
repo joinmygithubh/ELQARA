@@ -95,8 +95,15 @@ const Navbar = ({ onOpenSearch }) => {
 
             {/* Center on mobile / Left on desktop: Brand Logo */}
             <Link to="/" className="brand-logo" aria-label="ELQARA Homepage">
-              <span className="brand-name">ELQARA</span>
-              <span className="brand-tagline">OBJECTS FOR LIVING</span>
+              <img
+                src="/assets/elqara-logo.jpg"
+                alt=""
+                className="brand-logo-img"
+              />
+              <div className="brand-text-group">
+                <span className="brand-name">ELQARA</span>
+                <span className="brand-tagline">OBJECTS FOR LIVING</span>
+              </div>
             </Link>
 
             {/* Center: Desktop Navigation Links */}

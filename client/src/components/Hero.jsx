@@ -1,170 +1,120 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
-import heroSlide1 from '../assets/hero-slide-1.jpg';
-import heroSlide2 from '../assets/hero-slide-2.jpg';
-import heroSlide3 from '../assets/hero-slide-3.jpg';
+import { ArrowRight } from 'lucide-react';
+import heroBannerImg from '../assets/images/hero-banner.png';
+import slide2Img from '../assets/images/slider-1.png';
+import slide3Img from '../assets/images/slider-2.png';
 
-const Hero = ({ customSlides }) => {
-  const defaultSlides = [
-    {
-      id: 1,
-      preheading: 'PREMIUM HOME DÉCOR & LIGHTING',
-      title: 'Crafted forms.\nConsidered spaces.',
-      subtitle:
-        'Discover handcrafted lighting and décor that brings warmth, character and calm to your space.',
-      buttonText: 'EXPLORE COLLECTION',
-      buttonLink: '/shop',
-      badgeText: 'Handcrafted\nin India',
-      image: heroSlide1,
-      slideNumber: '01',
-      mobilePosition: '78% center'
-    },
-    {
-      id: 2,
-      preheading: 'ARCHITECTURAL ILLUMINATION',
-      title: 'Subtle warmth.\nTimeless glass.',
-      subtitle:
-        'Fluted amber crystal and brushed brass that infuse every corner with gentle, considered radiance.',
-      buttonText: 'DISCOVER LAMPS',
-      buttonLink: '/shop?category=table-lamps',
-      badgeText: 'Artisanal\nBrasswork',
-      image: heroSlide2,
-      slideNumber: '02',
-      mobilePosition: '72% center'
-    },
-    {
-      id: 3,
-      preheading: 'SCULPTURAL LIVING',
-      title: 'Graceful arcs.\nEffortless calm.',
-      subtitle:
-        'Elevate expansive living rooms with solid walnut arcs and hand-blown opaline diffusers.',
-      buttonText: 'VIEW FLOOR LAMPS',
-      buttonLink: '/shop?category=floor-lamps',
-      badgeText: 'Artisanal\nWoodcraft',
-      image: heroSlide3,
-      slideNumber: '03',
-      mobilePosition: '96% center'
-    }
-  ];
-
-  const slides = customSlides && customSlides.length > 0 ? customSlides : defaultSlides;
+const Hero = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const touchStartX = useRef(null);
+  const touchEndX = useRef(null);
 
-  // Auto advance slides gently every 8 seconds
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % slides.length);
-    }, 8000);
+      setCurrentSlide((prev) => (prev + 1) % 3);
+    }, 5000);
     return () => clearInterval(timer);
-  }, [slides.length]);
+  }, []);
 
-  const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % slides.length);
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.targetTouches[0].clientX;
   };
 
-  const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+  const handleTouchMove = (e) => {
+    touchEndX.current = e.targetTouches[0].clientX;
   };
 
-  const activeSlideData = slides[currentSlide] || slides[0];
+  const handleTouchEnd = () => {
+    if (!touchStartX.current || !touchEndX.current) return;
+    const distance = touchStartX.current - touchEndX.current;
+    if (distance > 50) {
+      setCurrentSlide((prev) => (prev + 1) % 3);
+    } else if (distance < -50) {
+      setCurrentSlide((prev) => (prev - 1 + 3) % 3);
+    }
+    touchStartX.current = null;
+    touchEndX.current = null;
+  };
 
   return (
-    <section className="hero-wrapper" aria-label="Hero Spotlight">
-      {/* Slides Stage / Track */}
-      <div className="hero-slides-wrapper">
-        {slides.map((slide, index) => {
-          const mobilePos =
-            slide.mobilePosition ||
-            (index === 2 ? '96% center' : index === 1 ? '72% center' : '78% center');
+    <section
+      className="hero-slider-section"
+      aria-label="Hero Spotlight Slider"
+      style={{ position: 'relative', width: '100%', overflow: 'hidden' }}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
+      <div
+        className="hero-slider-track"
+        style={{
+          display: 'flex',
+          width: '100%',
+          alignItems: 'stretch',
+          transform: `translateX(-${currentSlide * 100}%)`,
+          transition: 'transform 850ms cubic-bezier(0.25, 1, 0.5, 1)',
+          willChange: 'transform'
+        }}
+      >
+        {/* Slide 1: Exact Existing First Image & Text Overlay */}
+        <div style={{ flex: '0 0 100%', width: '100%', minWidth: '100%', position: 'relative' }}>
+          <div className="hero-banner-section">
+            <img
+              src={heroBannerImg}
+              alt="ELQARA - Objects for Living - Timeless Decor for Modern Spaces"
+              className="hero-banner-bg"
+              loading="eager"
+            />
+            <div className="hero-banner-overlay" />
+            <div className="container hero-banner-container">
+              <div className="hero-banner-content">
+                <div className="hero-banner-brand-block">
+                  <span className="hero-banner-brand">ELQARA</span>
+                  <span className="hero-banner-brand-sub">Objects for Living</span>
+                  <div className="hero-banner-divider" />
+                </div>
 
-          return (
-            <div
-              key={slide.id || index}
-              className={`hero-slide ${index === currentSlide ? 'active' : ''}`}
-            >
-              <img
-                src={slide.image || heroSlide1}
-                alt={slide.title.replace('\n', ' ')}
-                className={`hero-bg-img hero-bg-img-${(index % 3) + 1}`}
-                loading={index === 0 ? 'eager' : 'lazy'}
-              />
-              <div className="hero-gradient" />
+                <h1 className="hero-banner-heading">
+                  Timeless Decor<br />for Modern Spaces
+                </h1>
+
+                <p className="hero-banner-text">
+                  Explore handcrafted home décor and lighting that bring warmth, character and elegance to your everyday spaces.
+                </p>
+
+                <Link to="/shop" className="hero-banner-btn">
+                  <span>EXPLORE COLLECTION</span>
+                  <ArrowRight size={16} />
+                </Link>
+              </div>
             </div>
-          );
-        })}
-
-        {/* Handcrafted Badge positioned on the visual stage */}
-        <div className="hero-handcrafted-badge">
-          <div className="hero-handcrafted-line" />
-          <div className="hero-handcrafted-text">
-            {activeSlideData.badgeText.split('\n').map((line, i) => (
-              <div key={i}>{line}</div>
-            ))}
           </div>
         </div>
-      </div>
 
-      {/* Hero Editorial Content Stage */}
-      <div className="container hero-content-container">
-        {/* Center-Left Editorial Typography & CTA */}
-        <div className="hero-editorial-box">
-          <div className="pre-heading white">
-            {activeSlideData.preheading}
+        {/* Slide 2: Newly Uploaded Photo 1 (Clean photo only - no text, captions, buttons, or overlays) */}
+        <div style={{ flex: '0 0 100%', width: '100%', minWidth: '100%', position: 'relative' }}>
+          <div className="hero-banner-section" style={{ padding: 0 }}>
+            <img
+              src={slide2Img}
+              alt="ELQARA Handcrafted Travertine Table Lamp"
+              className="hero-banner-bg"
+              loading="lazy"
+              style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }}
+            />
           </div>
-
-          <h1 className="hero-title">
-            {activeSlideData.title.split('\n').map((line, i) => (
-              <span key={i} style={{ display: 'block' }}>
-                {line}
-              </span>
-            ))}
-          </h1>
-
-          <p className="hero-subtitle">
-            {activeSlideData.subtitle}
-          </p>
-
-          <Link
-            to={activeSlideData.buttonLink || '/shop'}
-            className="btn-primary"
-            style={{ borderRadius: '2px' }}
-          >
-            <span>{activeSlideData.buttonText}</span>
-            <ArrowRight size={17} />
-          </Link>
         </div>
 
-        {/* Carousel Pagination & Arrows Controls */}
-        <div className="hero-controls">
-          <div className="hero-pagination">
-            <span>0{currentSlide + 1}</span>
-            <div className="hero-progress-line">
-              <div
-                className="hero-progress-active"
-                style={{ width: `${((currentSlide + 1) / slides.length) * 100}%` }}
-              />
-            </div>
-            <span>0{slides.length}</span>
-          </div>
-
-          <div className="hero-arrow-btns">
-            <button
-              type="button"
-              className="btn-icon-circle"
-              onClick={prevSlide}
-              aria-label="Previous Slide"
-            >
-              <ChevronLeft size={18} />
-            </button>
-            <button
-              type="button"
-              className="btn-icon-circle"
-              onClick={nextSlide}
-              aria-label="Next Slide"
-            >
-              <ChevronRight size={18} />
-            </button>
+        {/* Slide 3: Newly Uploaded Photo 2 (Clean photo only - no text, captions, buttons, or overlays) */}
+        <div style={{ flex: '0 0 100%', width: '100%', minWidth: '100%', position: 'relative' }}>
+          <div className="hero-banner-section" style={{ padding: 0 }}>
+            <img
+              src={slide3Img}
+              alt="ELQARA Handcrafted Fluted Wood Lamp"
+              className="hero-banner-bg"
+              loading="lazy"
+              style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }}
+            />
           </div>
         </div>
       </div>

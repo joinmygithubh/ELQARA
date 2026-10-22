@@ -25,7 +25,11 @@ const AuthPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const from = location.state?.from?.pathname || '/account';
+  const from = typeof location.state?.from === 'string'
+    ? location.state.from
+    : (location.state?.from?.pathname
+        ? `${location.state.from.pathname}${location.state.from.search || ''}`
+        : '/account');
 
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -48,7 +52,7 @@ const AuthPage = () => {
         }
         await register(formData);
         showToast('Account created successfully! Welcome.', 'success');
-        navigate('/account', { replace: true });
+        navigate(from, { replace: true });
       } else if (mode === 'forgot') {
         if (!formData.email) {
           showToast('Please provide your registered email', 'error');
@@ -331,7 +335,7 @@ const AuthPage = () => {
           <button
             type="submit"
             disabled={loading}
-            className="btn-dark"
+            className={`btn-dark ${loading ? 'btn-shimmer' : ''}`}
             style={{ width: '100%', padding: '0.95rem', marginTop: '0.5rem' }}
           >
             <span>

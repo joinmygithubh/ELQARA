@@ -14,6 +14,7 @@ import Footer from './components/Footer';
 import CartDrawer from './components/CartDrawer';
 import WishlistDrawer from './components/WishlistDrawer';
 import SearchModal from './components/SearchModal';
+import LoginRequiredModal from './components/LoginRequiredModal';
 
 // Customer Pages
 import HomePage from './pages/HomePage';
@@ -70,10 +71,11 @@ const AppContent = () => {
 
   return (
     <>
-      {/* Search Modal, Cart Drawer, Wishlist Drawer */}
+      {/* Search Modal, Cart Drawer, Wishlist Drawer, Login Required Modal */}
       <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
       <CartDrawer />
       <WishlistDrawer />
+      <LoginRequiredModal />
 
       <Routes>
         {/* Admin Portal Authentication */}

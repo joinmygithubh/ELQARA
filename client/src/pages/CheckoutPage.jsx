@@ -20,7 +20,7 @@ const CheckoutPage = () => {
     removeCoupon,
     clearCart
   } = useCart();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, loading: authLoading } = useAuth();
   const { showToast } = useToast();
   const { formatPrice, currency, currentRate } = useCurrency();
   const navigate = useNavigate();
@@ -56,6 +56,12 @@ const CheckoutPage = () => {
 
   const handlePlaceOrder = async (e) => {
     e.preventDefault();
+
+    if (!isAuthenticated) {
+      showToast('You need to log in to buy products.', 'error');
+      navigate('/login', { state: { from: '/checkout' } });
+      return;
+    }
 
     if (cartItems.length === 0) {
       showToast('Your cart is empty', 'error');
@@ -126,6 +132,67 @@ const CheckoutPage = () => {
       setSubmitting(false);
     }
   };
+
+  if (!isAuthenticated && !authLoading) {
+    return (
+      <div className="container" style={{ padding: '6rem 1rem', textAlign: 'center' }}>
+        <div
+          style={{
+            maxWidth: '480px',
+            margin: '0 auto',
+            backgroundColor: '#FFFFFF',
+            border: '1px solid var(--border-hairline)',
+            borderRadius: 'var(--radius-sm)',
+            padding: '3rem 2rem',
+            boxShadow: 'var(--shadow-md)'
+          }}
+        >
+          <div
+            style={{
+              width: '54px',
+              height: '54px',
+              borderRadius: '50%',
+              backgroundColor: 'var(--bg-secondary)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 1.5rem',
+              color: 'var(--accent-gold)'
+            }}
+          >
+            <Lock size={24} />
+          </div>
+          <span className="pre-heading" style={{ justifyContent: 'center' }}>
+            COLLECTOR AUTHENTICATION
+          </span>
+          <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', color: 'var(--text-main)', marginTop: '0.4rem', marginBottom: '0.8rem' }}>
+            You need to log in to buy products.
+          </h2>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '2rem', lineHeight: 1.6 }}>
+            Please sign in to your patron account to complete checkout and manage delivery details.
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            <button
+              type="button"
+              className="btn-dark"
+              onClick={() => navigate('/login', { state: { from: '/checkout' } })}
+              style={{ width: '100%', padding: '0.9rem', justifyContent: 'center' }}
+            >
+              Login
+            </button>
+            <button
+              type="button"
+              className="btn-outline"
+              onClick={() => navigate('/shop')}
+              style={{ width: '100%', padding: '0.9rem', justifyContent: 'center' }}
+            >
+              Continue Shopping
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (cartItems.length === 0) {
     return (
@@ -617,7 +684,7 @@ const CheckoutPage = () => {
               <button
                 type="submit"
                 disabled={submitting}
-                className="btn-dark"
+                className={`btn-dark ${submitting ? 'btn-shimmer' : ''}`}
                 style={{ width: '100%', padding: '1rem', fontSize: '0.9rem' }}
               >
                 <Lock size={16} />

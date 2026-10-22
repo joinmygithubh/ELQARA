@@ -230,6 +230,20 @@ await runTest('7. Customers cannot access other customers orders', () => {
 });
 
 // -------------------------------------------------------------
+// Test 7b: Backend Order Creation Requires Authentication (401)
+// -------------------------------------------------------------
+await runTest('7b. Order creation route strictly requires authentication (protect middleware)', () => {
+  const orderRoutesContent = fs.readFileSync(
+    path.resolve('routes/orderRoutes.js'),
+    'utf-8'
+  );
+  assert.ok(
+    orderRoutesContent.includes("router.post('/', protect, createOrder)"),
+    'Order creation route must use protect middleware'
+  );
+});
+
+// -------------------------------------------------------------
 // Test 8: Order Total & Coupon Calculation Integrity (Server-Side)
 // -------------------------------------------------------------
 await runTest('8. Server-side order total and shipping fee policy calculation', () => {

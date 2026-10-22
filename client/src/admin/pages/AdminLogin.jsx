@@ -133,6 +133,7 @@ const AdminLogin = () => {
           <button
             type="submit"
             disabled={loading}
+            className={loading ? 'btn-shimmer' : ''}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -147,7 +148,7 @@ const AdminLogin = () => {
               textTransform: 'uppercase',
               border: 'none',
               borderRadius: 'var(--radius-xs)',
-              cursor: 'pointer',
+              cursor: loading ? 'not-allowed' : 'pointer',
               marginTop: '0.5rem',
               boxShadow: 'var(--shadow-warm)'
             }}

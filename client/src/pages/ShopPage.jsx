@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Filter, SlidersHorizontal, ChevronDown, RefreshCw, X, Search } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
+import ProductCardSkeleton from '../components/ProductCardSkeleton';
 import QuickViewModal from '../components/QuickViewModal';
 import { productAPI, categoryAPI } from '../services/api';
 import { useCurrency } from '../context/CurrencyContext';
@@ -311,9 +312,10 @@ const ShopPage = () => {
           {/* Product Grid Area */}
           <div>
             {loading ? (
-              <div style={{ padding: '5rem 0', textAlign: 'center', color: 'var(--text-muted)' }}>
-                <RefreshCw size={28} className="spin" style={{ margin: '0 auto 1rem' }} />
-                <p>Curating handcrafted collection...</p>
+              <div className="product-grid" aria-label="Loading products">
+                {[...Array(6)].map((_, i) => (
+                  <ProductCardSkeleton key={`skeleton-${i}`} />
+                ))}
               </div>
             ) : products.length === 0 ? (
               <div

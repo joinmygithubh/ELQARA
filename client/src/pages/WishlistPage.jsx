@@ -4,13 +4,19 @@ import { Heart, ShoppingBag, Trash2, ArrowRight } from 'lucide-react';
 import { useWishlist } from '../context/WishlistContext';
 import { useCart } from '../context/CartContext';
 import { useCurrency } from '../context/CurrencyContext';
+import { useAuth } from '../context/AuthContext';
 
 const WishlistPage = () => {
   const { wishlistItems, removeFromWishlist } = useWishlist();
   const { addToCart } = useCart();
   const { formatPrice } = useCurrency();
+  const { isAuthenticated, openAuthModal } = useAuth();
 
   const handleMoveToCart = (item) => {
+    if (!isAuthenticated) {
+      openAuthModal('/wishlist');
+      return;
+    }
     addToCart(item, 1);
     removeFromWishlist(item._id);
   };

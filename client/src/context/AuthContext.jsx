@@ -73,6 +73,24 @@ export const AuthProvider = ({ children }) => {
     setUser(updatedUser);
   };
 
+  const [authModal, setAuthModal] = useState({
+    isOpen: false,
+    returnUrl: '/checkout',
+    message: 'You need to log in to buy products.'
+  });
+
+  const openAuthModal = (returnUrl = '/checkout', message = 'You need to log in to buy products.') => {
+    setAuthModal({
+      isOpen: true,
+      returnUrl,
+      message
+    });
+  };
+
+  const closeAuthModal = () => {
+    setAuthModal((prev) => ({ ...prev, isOpen: false }));
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -81,6 +99,9 @@ export const AuthProvider = ({ children }) => {
         loading,
         isAuthenticated: !!user,
         isAdmin: user?.role === 'admin',
+        authModal,
+        openAuthModal,
+        closeAuthModal,
         login,
         adminLogin,
         register,

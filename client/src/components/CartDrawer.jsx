@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { X, Trash2, Plus, Minus, ShoppingBag, ArrowRight, Tag } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useCurrency } from '../context/CurrencyContext';
+import { useAuth } from '../context/AuthContext';
 
 const CartDrawer = () => {
   const {
@@ -21,6 +22,7 @@ const CartDrawer = () => {
   } = useCart();
 
   const { formatPrice, currency } = useCurrency();
+  const { isAuthenticated, openAuthModal } = useAuth();
   const [couponInput, setCouponInput] = useState('');
   const [applying, setApplying] = useState(false);
   const navigate = useNavigate();
@@ -36,6 +38,10 @@ const CartDrawer = () => {
 
   const handleCheckout = () => {
     closeCart();
+    if (!isAuthenticated) {
+      openAuthModal('/checkout');
+      return;
+    }
     navigate('/checkout');
   };
 

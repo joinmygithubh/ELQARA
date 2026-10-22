@@ -38,21 +38,27 @@ export const CartProvider = ({ children }) => {
     }
   }, [coupon]);
 
-  const addToCart = (product, quantity = 1) => {
+  const addToCart = (product, quantity = 1, options = {}) => {
     setCartItems((prev) => {
       const existingIndex = prev.findIndex((item) => item.product === product._id);
       if (existingIndex > -1) {
         const updated = [...prev];
         const newQty = updated[existingIndex].quantity + quantity;
         if (newQty > product.stock) {
-          showToast(`Only ${product.stock} items available in stock`, 'error');
+          if (!options.silent) {
+            showToast(`Only ${product.stock} items available in stock`, 'error');
+          }
           return prev;
         }
         updated[existingIndex].quantity = newQty;
-        showToast(`Updated "${product.name}" quantity (${newQty})`, 'success');
+        if (!options.silent) {
+          showToast(`Updated "${product.name}" quantity (${newQty})`, 'success');
+        }
         return updated;
       } else {
-        showToast(`Added "${product.name}" to bag`, 'success');
+        if (!options.silent) {
+          showToast(`Added "${product.name}" to bag`, 'success');
+        }
         return [
           ...prev,
           {
@@ -69,7 +75,9 @@ export const CartProvider = ({ children }) => {
         ];
       }
     });
-    setIsCartOpen(true);
+    if (!options.silent) {
+      setIsCartOpen(true);
+    }
   };
 
   const removeFromCart = (productId) => {

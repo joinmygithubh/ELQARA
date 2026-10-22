@@ -4,11 +4,13 @@ import { X, Star, ShoppingBag, Heart, Check, ArrowRight } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useCurrency } from '../context/CurrencyContext';
+import { useAuth } from '../context/AuthContext';
 
 const QuickViewModal = ({ product, isOpen, onClose }) => {
   const { addToCart } = useCart();
   const { isInWishlist, toggleWishlist } = useWishlist();
   const { formatPrice } = useCurrency();
+  const { isAuthenticated, openAuthModal } = useAuth();
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
 
@@ -18,6 +20,11 @@ const QuickViewModal = ({ product, isOpen, onClose }) => {
   const images = product.images && product.images.length > 0 ? product.images : [product.thumbnail || '/logo-icon.svg'];
 
   const handleAddToCart = () => {
+    if (!isAuthenticated) {
+      onClose();
+      openAuthModal(`/product/${product.slug}`);
+      return;
+    }
     addToCart(product, quantity);
     onClose();
   };

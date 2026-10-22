@@ -11,8 +11,8 @@ import { protect, adminOnly, optionalAuth } from '../middleware/auth.js';
 
 const router = express.Router();
 
-// Order creation (Guests & registered users)
-router.post('/', optionalAuth, createOrder);
+// Order creation (Authenticated users only)
+router.post('/', protect, createOrder);
 
 // Customer routes
 router.get('/my-orders', protect, getMyOrders);

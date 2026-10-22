@@ -5,7 +5,7 @@ import { getLiveRates } from '../services/currencyService.js';
 
 // @desc    Create a new order
 // @route   POST /api/orders
-// @access  Public (Guest or logged in user)
+// @access  Private (Authenticated users only)
 export const createOrder = async (req, res, next) => {
   try {
     const {

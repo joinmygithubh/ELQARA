@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   Heart,
   ShoppingBag,
@@ -18,15 +18,18 @@ import { productAPI } from '../services/api';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useCurrency } from '../context/CurrencyContext';
+import { useAuth } from '../context/AuthContext';
 import ProductCard from '../components/ProductCard';
 import EnquiryModal from '../components/EnquiryModal';
 
 const ProductDetailPage = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { addToCart } = useCart();
   const { isInWishlist, toggleWishlist } = useWishlist();
   const { formatPrice, currency } = useCurrency();
+  const { isAuthenticated, openAuthModal } = useAuth();
 
   const [product, setProduct] = useState(null);
   const [relatedProducts, setRelatedProducts] = useState([]);
@@ -60,8 +63,35 @@ const ProductDetailPage = () => {
 
   if (loading) {
     return (
-      <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ textAlign: 'center', color: 'var(--text-muted)' }}>Loading handcrafted edition...</div>
+      <div className="container" style={{ padding: '3.5rem 1rem 6rem' }} aria-label="Loading product details">
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+            gap: '3.5rem',
+            alignItems: 'start'
+          }}
+        >
+          <div>
+            <div className="shimmer-box" style={{ width: '100%', aspectRatio: '1/1', borderRadius: 'var(--radius-sm)', marginBottom: '1rem' }} />
+            <div style={{ display: 'flex', gap: '0.75rem' }}>
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="shimmer-box" style={{ width: '70px', height: '70px', borderRadius: 'var(--radius-xs)' }} />
+              ))}
+            </div>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            <div className="shimmer-box" style={{ width: '25%', height: '14px' }} />
+            <div className="shimmer-box" style={{ width: '85%', height: '36px' }} />
+            <div className="shimmer-box" style={{ width: '35%', height: '24px' }} />
+            <div className="shimmer-box" style={{ width: '100%', height: '110px', borderRadius: 'var(--radius-xs)' }} />
+            <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
+              <div className="shimmer-box" style={{ flex: 1, height: '48px', borderRadius: 'var(--radius-xs)' }} />
+              <div className="shimmer-box" style={{ width: '54px', height: '48px', borderRadius: 'var(--radius-xs)' }} />
+            </div>
+            <div className="shimmer-box" style={{ width: '100%', height: '48px', borderRadius: 'var(--radius-xs)' }} />
+          </div>
+        </div>
       </div>
     );
   }
@@ -87,10 +117,19 @@ const ProductDetailPage = () => {
   const isOutOfStock = product.stock <= 0;
 
   const handleAddToCart = () => {
+    if (!isAuthenticated) {
+      openAuthModal(location.pathname);
+      return;
+    }
     addToCart(product, quantity);
   };
 
   const handleBuyNow = () => {
+    if (!isAuthenticated) {
+      addToCart(product, quantity, { silent: true });
+      openAuthModal('/checkout');
+      return;
+    }
     addToCart(product, quantity);
     navigate('/checkout');
   };

@@ -4,12 +4,14 @@ import { Heart, ShoppingBag, Eye, Star, MessageSquare } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useCurrency } from '../context/CurrencyContext';
+import { useAuth } from '../context/AuthContext';
 import EnquiryModal from './EnquiryModal';
 
 const ProductCard = ({ product, onQuickView }) => {
   const { addToCart } = useCart();
   const { isInWishlist, toggleWishlist } = useWishlist();
   const { formatPrice } = useCurrency();
+  const { isAuthenticated, openAuthModal } = useAuth();
   const [isEnquiryOpen, setIsEnquiryOpen] = useState(false);
 
   if (!product) return null;
@@ -70,7 +72,13 @@ const ProductCard = ({ product, onQuickView }) => {
             <button
               type="button"
               className="btn-quick-add"
-              onClick={() => addToCart(product, 1)}
+              onClick={() => {
+                if (!isAuthenticated) {
+                  openAuthModal(`/product/${product.slug}`);
+                  return;
+                }
+                addToCart(product, 1);
+              }}
             >
               <ShoppingBag size={15} />
               <span>Add to Bag</span>
