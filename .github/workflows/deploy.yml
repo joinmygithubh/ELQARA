@@ -1,0 +1,316 @@
+name: Deploy ELQARA Production (EC2)
+
+'on':
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: production-deployment
+  cancel-in-progress: false
+
+jobs:
+  validate-and-build:
+    name: Build & Validate
+    runs-on: ubuntu-latest
+    outputs:
+      backend_changed: ${{ steps.detect_changes.outputs.backend_changed }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Setup Node.js (v20)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: |
+            client/package-lock.json
+            server/package-lock.json
+
+      # Step 1: Detect backend changes
+      - name: Detect Changes
+        id: detect_changes
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "Manual deployment trigger detected. Marking backend for deployment."
+            echo "backend_changed=true" >> "$GITHUB_OUTPUT"
+          elif [ -z "${{ github.event.before }}" ] || [ "${{ github.event.before }}" = "0000000000000000000000000000000000000000" ]; then
+            echo "Initial commit or force-push detected. Marking backend for deployment."
+            echo "backend_changed=true" >> "$GITHUB_OUTPUT"
+          else
+            if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -E -q '^(server/|\.github/workflows/deploy\.yml)'; then
+              echo "Backend changes detected in commit diff."
+              echo "backend_changed=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "No backend changes detected in commit diff."
+              echo "backend_changed=false" >> "$GITHUB_OUTPUT"
+            fi
+          fi
+
+      # Step 2: Validate and build frontend
+      - name: Install Frontend Dependencies
+        working-directory: client
+        run: npm ci
+
+      - name: Configure Production Environment Variables
+        run: |
+          echo "VITE_API_URL=https://elqara.in/api" > client/.env.production.local
+
+      - name: Build Frontend
+        working-directory: client
+        env:
+          VITE_API_URL: https://elqara.in/api
+        run: npm run build
+
+      - name: Validate Frontend Build Artifacts
+        run: |
+          echo "Verifying client/dist files..."
+          test -f client/dist/index.html || { echo "ERROR: client/dist/index.html missing"; exit 1; }
+          test -d client/dist/assets || { echo "ERROR: client/dist/assets missing"; exit 1; }
+          DIST_SIZE=$(du -sh client/dist | cut -f1)
+          echo "Frontend build successfully verified. Total bundle size: $DIST_SIZE"
+
+      # Step 3: Validate backend syntax and tests
+      - name: Install Backend Dependencies
+        working-directory: server
+        run: npm ci
+
+      - name: Validate Backend Syntax & Integrity
+        working-directory: server
+        run: |
+          node --check server.js
+          node --check app.js
+          node test_login_gated_and_shimmer.mjs
+
+      # Step 4: Archive frontend build artifact for deploy job
+      - name: Upload Frontend Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: client/dist/
+          if-no-files-found: error
+          retention-days: 1
+
+  deploy-production:
+    name: Deploy to AWS EC2
+    needs: validate-and-build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Download Frontend Build Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist
+          path: client/dist/
+
+      # Step 1: Configure SSH Agent / Key
+      - name: Configure Secure SSH
+        env:
+          SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+          SSH_HOST: ${{ secrets.EC2_HOST }}
+          SSH_PORT: ${{ secrets.EC2_SSH_PORT || '22' }}
+        run: |
+          if [ -z "$SSH_KEY" ]; then
+            echo "ERROR: EC2_SSH_KEY secret is not configured in repository secrets!"
+            exit 1
+          fi
+          if [ -z "$SSH_HOST" ]; then
+            echo "ERROR: EC2_HOST secret is not configured in repository secrets!"
+            exit 1
+          fi
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -p "$SSH_PORT" -H "$SSH_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+          chmod 644 ~/.ssh/known_hosts
+
+      # Step 2: Deploy Frontend to /var/www/elqara
+      - name: Deploy Frontend to /var/www/elqara
+        id: deploy_frontend
+        env:
+          SSH_HOST: ${{ secrets.EC2_HOST }}
+          SSH_USER: ${{ secrets.EC2_USER || 'ec2-user' }}
+          SSH_PORT: ${{ secrets.EC2_SSH_PORT || '22' }}
+        run: |
+          echo "==> Staging frontend build on EC2..."
+          ssh -i ~/.ssh/deploy_key -p $SSH_PORT -o StrictHostKeyChecking=accept-new "$SSH_USER@$SSH_HOST" "rm -rf /tmp/elqara_frontend_stage && mkdir -p /tmp/elqara_frontend_stage"
+          
+          rsync -avz --delete \
+            -e "ssh -i ~/.ssh/deploy_key -p $SSH_PORT -o StrictHostKeyChecking=accept-new" \
+            client/dist/ "$SSH_USER@$SSH_HOST:/tmp/elqara_frontend_stage/"
+
+          echo "==> Backing up previous frontend and atomically deploying to /var/www/elqara..."
+          ssh -i ~/.ssh/deploy_key -p $SSH_PORT -o StrictHostKeyChecking=accept-new "$SSH_USER@$SSH_HOST" << 'EOF'
+            set -e
+            if [ -d "/var/www/elqara" ]; then
+              sudo rm -rf /var/www/elqara_backup
+              sudo cp -r /var/www/elqara /var/www/elqara_backup
+              echo "Backup created at /var/www/elqara_backup"
+            fi
+            sudo mkdir -p /var/www/elqara
+            sudo rsync -av --delete /tmp/elqara_frontend_stage/ /var/www/elqara/
+            sudo rm -rf /tmp/elqara_frontend_stage
+            
+            # Set permissions: accessible by Nginx web server
+            sudo chown -R ec2-user:nginx /var/www/elqara 2>/dev/null || sudo chown -R ec2-user:ec2-user /var/www/elqara
+            sudo chmod -R 755 /var/www/elqara
+            echo "Frontend successfully deployed to /var/www/elqara."
+          EOF
+
+      # Step 3: Deploy Backend if needed
+      - name: Deploy Backend & Manage Service
+        id: deploy_backend
+        env:
+          SSH_HOST: ${{ secrets.EC2_HOST }}
+          SSH_USER: ${{ secrets.EC2_USER || 'ec2-user' }}
+          SSH_PORT: ${{ secrets.EC2_SSH_PORT || '22' }}
+          BACKEND_CHANGED: ${{ needs.validate-and-build.outputs.backend_changed }}
+        run: |
+          echo "==> Backend changed flag: $BACKEND_CHANGED"
+          
+          echo "==> Staging backend files on EC2..."
+          ssh -i ~/.ssh/deploy_key -p $SSH_PORT -o StrictHostKeyChecking=accept-new "$SSH_USER@$SSH_HOST" "rm -rf /tmp/elqara_backend_stage && mkdir -p /tmp/elqara_backend_stage"
+
+          rsync -avz \
+            --exclude='.env' \
+            --exclude='.env.*' \
+            --exclude='uploads/' \
+            --exclude='uploads/**' \
+            --exclude='node_modules/' \
+            --exclude='.git/' \
+            -e "ssh -i ~/.ssh/deploy_key -p $SSH_PORT -o StrictHostKeyChecking=accept-new" \
+            server/ "$SSH_USER@$SSH_HOST:/tmp/elqara_backend_stage/"
+
+          echo "==> Deploying backend changes safely to /home/ec2-user/ELQARA/server..."
+          ssh -i ~/.ssh/deploy_key -p $SSH_PORT -o StrictHostKeyChecking=accept-new "$SSH_USER@$SSH_HOST" BACKEND_CHANGED="$BACKEND_CHANGED" << 'EOF'
+            set -e
+            export PATH=$PATH:/usr/local/bin:/usr/bin:~/.nvm/versions/node/$(ls ~/.nvm/versions/node 2>/dev/null | tail -1)/bin
+
+            TARGET_DIR="/home/ec2-user/ELQARA/server"
+            mkdir -p "$TARGET_DIR"
+
+            # 1. Backup existing code (excluding node_modules and uploads)
+            if [ -d "$TARGET_DIR" ] && [ "$(ls -A "$TARGET_DIR" 2>/dev/null)" ]; then
+              rm -rf /home/ec2-user/ELQARA/server_backup
+              mkdir -p /home/ec2-user/ELQARA/server_backup
+              rsync -a --exclude='node_modules' --exclude='uploads' "$TARGET_DIR/" /home/ec2-user/ELQARA/server_backup/
+              echo "Backup created at /home/ec2-user/ELQARA/server_backup"
+            fi
+
+            # 2. Check for dependency differences
+            PKG_LOCK_CHANGED=false
+            if [ -f "$TARGET_DIR/package-lock.json" ] && [ -f "/tmp/elqara_backend_stage/package-lock.json" ]; then
+              if ! cmp -s "$TARGET_DIR/package-lock.json" "/tmp/elqara_backend_stage/package-lock.json"; then
+                PKG_LOCK_CHANGED=true
+              fi
+            else
+              PKG_LOCK_CHANGED=true
+            fi
+
+            # 3. Synchronize new backend files, preserving .env and uploads
+            rsync -av \
+              --exclude='.env' \
+              --exclude='.env.*' \
+              --exclude='uploads/' \
+              --exclude='uploads/**' \
+              --exclude='node_modules/' \
+              /tmp/elqara_backend_stage/ "$TARGET_DIR/"
+            rm -rf /tmp/elqara_backend_stage
+
+            cd "$TARGET_DIR"
+
+            # 4. Install production dependencies if changed or missing
+            if [ "$PKG_LOCK_CHANGED" = "true" ] || [ ! -d "node_modules" ]; then
+              echo "Updating production dependencies via npm ci..."
+              npm ci --omit=dev
+            else
+              echo "Dependencies unchanged. Skipping npm ci."
+            fi
+
+            # 5. Restart service only if backend changes occurred or dependencies updated
+            if [ "$BACKEND_CHANGED" = "true" ] || [ "$PKG_LOCK_CHANGED" = "true" ]; then
+              echo "Restarting systemd service: elqara-backend..."
+              sudo systemctl restart elqara-backend
+              sleep 3
+              if ! sudo systemctl is-active --quiet elqara-backend; then
+                echo "ERROR: elqara-backend failed to start!"
+                sudo journalctl -u elqara-backend -n 40 --no-pager
+                exit 1
+              fi
+              echo "elqara-backend is active and running."
+            else
+              echo "No backend modifications; skipping systemd restart."
+            fi
+          EOF
+
+      # Step 4: Health Check
+      - name: Post-Deployment Health Check
+        id: health_check
+        run: |
+          echo "Checking backend health at https://elqara.in/api/health..."
+          HEALTHY=false
+          for i in {1..8}; do
+            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 https://elqara.in/api/health || true)
+            echo "Health check attempt $i: status $HTTP_STATUS"
+            if [ "$HTTP_STATUS" = "200" ]; then
+              HEALTHY=true
+              break
+            fi
+            sleep 5
+          done
+
+          if [ "$HEALTHY" != "true" ]; then
+            echo "ERROR: Backend API health check failed after 8 attempts!"
+            exit 1
+          fi
+          echo "Backend health check PASSED (HTTP 200)."
+
+          echo "Checking storefront frontend root at https://elqara.in..."
+          FRONTEND_STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 https://elqara.in || true)
+          echo "Frontend HTTP status: $FRONTEND_STATUS"
+          if [ "$FRONTEND_STATUS" != "200" ] && [ "$FRONTEND_STATUS" != "301" ] && [ "$FRONTEND_STATUS" != "302" ]; then
+            echo "ERROR: Storefront returned unexpected status $FRONTEND_STATUS"
+            exit 1
+          fi
+          echo "Storefront check PASSED."
+
+      # Step 5: Rollback on Failure
+      - name: Rollback on Failure
+        if: failure() && (steps.deploy_frontend.outcome == 'failure' || steps.deploy_backend.outcome == 'failure' || steps.health_check.outcome == 'failure')
+        env:
+          SSH_HOST: ${{ secrets.EC2_HOST }}
+          SSH_USER: ${{ secrets.EC2_USER || 'ec2-user' }}
+          SSH_PORT: ${{ secrets.EC2_SSH_PORT || '22' }}
+        run: |
+          echo "Initiating automated rollback on EC2..."
+          ssh -i ~/.ssh/deploy_key -p $SSH_PORT -o StrictHostKeyChecking=accept-new "$SSH_USER@$SSH_HOST" << 'EOF'
+            set -e
+            echo "Executing rollback procedure..."
+
+            # Restore frontend backup
+            if [ -d "/var/www/elqara_backup" ]; then
+              echo "Restoring /var/www/elqara from backup..."
+              sudo rsync -av --delete /var/www/elqara_backup/ /var/www/elqara/
+              sudo chmod -R 755 /var/www/elqara
+              echo "Frontend rollback complete."
+            fi
+
+            # Restore backend backup
+            if [ -d "/home/ec2-user/ELQARA/server_backup" ]; then
+              echo "Restoring backend from /home/ec2-user/ELQARA/server_backup..."
+              rsync -av \
+                --exclude='.env' \
+                --exclude='uploads/' \
+                --exclude='node_modules/' \
+                /home/ec2-user/ELQARA/server_backup/ /home/ec2-user/ELQARA/server/
+              sudo systemctl restart elqara-backend || true
+              echo "Backend rollback complete."
+            fi
+          EOF
