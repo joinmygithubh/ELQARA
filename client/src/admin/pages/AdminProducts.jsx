@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Plus, Search, Edit2, Trash2, Eye, ToggleLeft, ToggleRight, Check, X, AlertTriangle } from 'lucide-react';
 import { productAPI, categoryAPI } from '../../services/api';
 import { useToast } from '../../context/ToastContext';
+import { getProductImageUrl, handleImageError } from '../../utils/imageUrl';
 
 const AdminProducts = () => {
   const [products, setProducts] = useState([]);
@@ -195,14 +196,20 @@ const AdminProducts = () => {
                 <tr key={p._id}>
                   <td>
                     <img
-                      src={p.thumbnail || (p.images && p.images[0]) || '/logo-icon.svg'}
+                      src={getProductImageUrl(p, { width: 92, quality: 75, isThumbnail: true })}
                       alt={p.name}
+                      width="46"
+                      height="46"
+                      loading="lazy"
+                      decoding="async"
+                      onError={handleImageError}
                       style={{
                         width: '46px',
                         height: '46px',
                         objectFit: 'cover',
                         borderRadius: '2px',
-                        backgroundColor: '#F8F5F0'
+                        backgroundColor: '#F8F5F0',
+                        aspectRatio: '1 / 1'
                       }}
                     />
                   </td>

@@ -4,6 +4,7 @@ import { X, Trash2, Plus, Minus, ShoppingBag, ArrowRight, Tag } from 'lucide-rea
 import { useCart } from '../context/CartContext';
 import { useCurrency } from '../context/CurrencyContext';
 import { useAuth } from '../context/AuthContext';
+import { getOptimizedImageUrl, handleImageError } from '../utils/imageUrl';
 
 const CartDrawer = () => {
   const {
@@ -164,14 +165,20 @@ const CartDrawer = () => {
                   }}
                 >
                   <img
-                    src={item.image || '/logo-icon.svg'}
+                    src={getOptimizedImageUrl(item.image, { width: 148, quality: 75, isThumbnail: true })}
                     alt={item.name}
+                    width="74"
+                    height="74"
+                    loading="lazy"
+                    decoding="async"
+                    onError={handleImageError}
                     style={{
                       width: '74px',
                       height: '74px',
                       objectFit: 'cover',
                       backgroundColor: '#F7F4EE',
-                      borderRadius: 'var(--radius-xs)'
+                      borderRadius: 'var(--radius-xs)',
+                      aspectRatio: '1 / 1'
                     }}
                   />
                   <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>

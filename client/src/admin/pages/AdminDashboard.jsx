@@ -13,6 +13,7 @@ import {
   Plus
 } from 'lucide-react';
 import { orderAPI, productAPI, customerAPI } from '../../services/api';
+import { getProductImageUrl, handleImageError } from '../../utils/imageUrl';
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState(null);
@@ -248,9 +249,14 @@ const AdminDashboard = () => {
               {lowStockProducts.map((p) => (
                 <div key={p._id} style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', paddingBottom: '0.8rem', borderBottom: '1px solid var(--border-hairline)' }}>
                   <img
-                    src={p.thumbnail || '/logo-icon.svg'}
+                    src={getProductImageUrl(p, { width: 88, quality: 75, isThumbnail: true })}
                     alt={p.name}
-                    style={{ width: '44px', height: '44px', objectFit: 'cover', borderRadius: '2px', backgroundColor: '#F8F5F0' }}
+                    width="44"
+                    height="44"
+                    loading="lazy"
+                    decoding="async"
+                    onError={handleImageError}
+                    style={{ width: '44px', height: '44px', objectFit: 'cover', borderRadius: '2px', backgroundColor: '#F8F5F0', aspectRatio: '1 / 1' }}
                   />
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: '0.88rem', fontWeight: 500, color: 'var(--text-main)' }}>{p.name}</div>

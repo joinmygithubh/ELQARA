@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Compass, ShieldCheck, Sparkles } from 'lucide-react';
+import { getOptimizedImageUrl, handleImageError } from '../utils/imageUrl';
 
 const AboutPage = () => {
   return (
@@ -73,8 +74,13 @@ const AboutPage = () => {
 
           <div style={{ borderRadius: 'var(--radius-sm)', overflow: 'hidden', boxShadow: 'var(--shadow-md)' }}>
             <img
-              src="/uploads/hero-slide-1.jpg"
+              src={getOptimizedImageUrl('/uploads/hero-slide-1.jpg', { width: 800, quality: 80 })}
               alt="Artisanal woodturning at ELQARA"
+              width="600"
+              height="480"
+              loading="lazy"
+              decoding="async"
+              onError={handleImageError}
               style={{ width: '100%', height: '480px', objectFit: 'cover' }}
             />
           </div>

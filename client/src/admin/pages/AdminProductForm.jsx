@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, Upload, Trash2, Check, Star, Image as ImageIcon } from 'lucide-react';
 import { productAPI, categoryAPI, uploadAPI } from '../../services/api';
 import { useToast } from '../../context/ToastContext';
+import { handleImageError } from '../../utils/imageUrl';
 
 const AdminProductForm = () => {
   const { id } = useParams();
@@ -519,7 +520,12 @@ const AdminProductForm = () => {
                           backgroundColor: '#F8F5F0'
                         }}
                       >
-                        <img src={img} alt="Product" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        <img
+                          src={img}
+                          alt="Product"
+                          onError={handleImageError}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        />
 
                         {/* Thumbnail selector badge */}
                         <button

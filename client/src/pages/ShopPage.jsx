@@ -340,8 +340,13 @@ const ShopPage = () => {
             ) : (
               <>
                 <div className="product-grid">
-                  {products.map((p) => (
-                    <ProductCard key={p._id} product={p} onQuickView={setQuickViewProduct} />
+                  {products.map((p, idx) => (
+                    <ProductCard
+                      key={p._id}
+                      product={p}
+                      priority={idx < 4 && pageParam === 1}
+                      onQuickView={setQuickViewProduct}
+                    />
                   ))}
                 </div>
 

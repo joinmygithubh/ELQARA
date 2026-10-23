@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Clock } from 'lucide-react';
+import { getOptimizedImageUrl, handleImageError } from '../utils/imageUrl';
 
 const JournalPage = () => {
   const articles = [
@@ -91,8 +92,13 @@ const JournalPage = () => {
             >
               <div style={{ aspectRatio: '16 / 10', backgroundColor: '#F4EFEA', overflow: 'hidden' }}>
                 <img
-                  src={item.image}
+                  src={getOptimizedImageUrl(item.image, { width: 600, quality: 80 })}
                   alt={item.title}
+                  width="400"
+                  height="250"
+                  loading="lazy"
+                  decoding="async"
+                  onError={handleImageError}
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                 />
               </div>

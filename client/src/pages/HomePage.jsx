@@ -8,9 +8,10 @@ import ProductCardSkeleton from '../components/ProductCardSkeleton';
 import QuickViewModal from '../components/QuickViewModal';
 import { productAPI, categoryAPI, homepageAPI } from '../services/api';
 import { useCurrency } from '../context/CurrencyContext';
-import heroBannerEditorial from '../assets/hero-banner-editorial.png';
-import heroSlideTravertine from '../assets/hero-slide-travertine.png';
-import heroSlideFluted from '../assets/hero-slide-fluted.png';
+import heroBannerEditorial from '../assets/hero-banner-editorial.webp';
+import heroSlideTravertine from '../assets/hero-slide-travertine.webp';
+import heroSlideFluted from '../assets/hero-slide-fluted.webp';
+import { getOptimizedImageUrl, handleImageError } from '../utils/imageUrl';
 
 const HomePage = () => {
   const { formatPrice } = useCurrency();
@@ -96,8 +97,11 @@ const HomePage = () => {
                 className="category-card-hover"
               >
                 <img
-                  src={cat.image || '/uploads/prod-mushroom-wood.jpg'}
+                  src={getOptimizedImageUrl(cat.image || '/uploads/prod-mushroom-wood.jpg', { width: 450, isThumbnail: true })}
                   alt={cat.name}
+                  loading="lazy"
+                  decoding="async"
+                  onError={handleImageError}
                   style={{
                     position: 'absolute',
                     inset: 0,
@@ -163,10 +167,11 @@ const HomePage = () => {
                 <ProductCardSkeleton key={`home-feat-skel-${i}`} />
               ))
             ) : (
-              featuredProducts.map((product) => (
+              featuredProducts.map((product, idx) => (
                 <ProductCard
                   key={product._id}
                   product={product}
+                  priority={idx < 2}
                   onQuickView={setQuickViewProduct}
                 />
               ))
@@ -269,6 +274,9 @@ const HomePage = () => {
                 <img
                   src={heroSlideFluted}
                   alt="ELQARA Handcrafted Wood Lamp"
+                  loading="lazy"
+                  decoding="async"
+                  onError={handleImageError}
                   style={{ width: '100%', height: '520px', objectFit: 'cover' }}
                 />
               </div>
@@ -335,6 +343,9 @@ const HomePage = () => {
               <img
                 src={heroSlideTravertine}
                 alt="Room ambience test"
+                loading="lazy"
+                decoding="async"
+                onError={handleImageError}
                 style={{
                   width: '100%',
                   height: '100%',
@@ -467,6 +478,8 @@ const HomePage = () => {
                   alt="ELQARA Travertine Hourglass Table Lamp in Living Space"
                   className="atelier-showcase-img"
                   loading="lazy"
+                  decoding="async"
+                  onError={handleImageError}
                 />
                 <div className="atelier-showcase-badge">01 / TRAVERTINE EDITION</div>
               </div>
@@ -502,6 +515,8 @@ const HomePage = () => {
                   alt="ELQARA Fluted Wood Column Lamp on Console"
                   className="atelier-showcase-img"
                   loading="lazy"
+                  decoding="async"
+                  onError={handleImageError}
                 />
                 <div className="atelier-showcase-badge">02 / FLUTED EDITION</div>
               </div>

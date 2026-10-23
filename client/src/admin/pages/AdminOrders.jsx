@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Eye, Search, Filter, CheckCircle, Truck, Package, Clock, X } from 'lucide-react';
 import { orderAPI } from '../../services/api';
 import { useToast } from '../../context/ToastContext';
+import { getOptimizedImageUrl, handleImageError } from '../../utils/imageUrl';
 
 const AdminOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -311,9 +312,14 @@ const AdminOrders = () => {
               {selectedOrder.items?.map((it, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '1rem', paddingBottom: '0.75rem', borderBottom: '1px solid var(--border-hairline)' }}>
                   <img
-                    src={it.image || '/logo-icon.svg'}
+                    src={getOptimizedImageUrl(it.image, { width: 96, quality: 75, isThumbnail: true })}
                     alt={it.name}
-                    style={{ width: '48px', height: '48px', objectFit: 'cover', borderRadius: '2px', backgroundColor: '#F8F5F0' }}
+                    width="48"
+                    height="48"
+                    loading="lazy"
+                    decoding="async"
+                    onError={handleImageError}
+                    style={{ width: '48px', height: '48px', objectFit: 'cover', borderRadius: '2px', backgroundColor: '#F8F5F0', aspectRatio: '1 / 1' }}
                   />
                   <div style={{ flex: 1 }}>
                     <div style={{ fontWeight: 600, fontSize: '0.95rem' }}>{it.name}</div>

@@ -4,6 +4,7 @@ import { Trash2, Plus, Minus, ArrowRight, ShoppingBag, ShieldCheck, Tag } from '
 import { useCart } from '../context/CartContext';
 import { useCurrency } from '../context/CurrencyContext';
 import { useAuth } from '../context/AuthContext';
+import { getOptimizedImageUrl, handleImageError } from '../utils/imageUrl';
 
 const CartPage = () => {
   const {
@@ -87,9 +88,14 @@ const CartPage = () => {
                 }}
               >
                 <img
-                  src={item.image || '/logo-icon.svg'}
+                  src={getOptimizedImageUrl(item.image, { width: 168, quality: 75, isThumbnail: true })}
                   alt={item.name}
-                  style={{ width: '84px', height: '84px', objectFit: 'cover', borderRadius: 'var(--radius-xs)', backgroundColor: '#F8F5F0' }}
+                  width="84"
+                  height="84"
+                  loading="lazy"
+                  decoding="async"
+                  onError={handleImageError}
+                  style={{ width: '84px', height: '84px', objectFit: 'cover', borderRadius: 'var(--radius-xs)', backgroundColor: '#F8F5F0', aspectRatio: '1 / 1' }}
                 />
 
                 <div style={{ flex: 1 }}>

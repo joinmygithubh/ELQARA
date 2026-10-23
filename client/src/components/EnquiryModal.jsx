@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, Send, CheckCircle2, AlertCircle, Loader2, Sparkles, Phone, Mail, MessageSquare } from 'lucide-react';
 import { enquiryAPI } from '../services/api';
 import { useToast } from '../context/ToastContext';
+import { getProductImageUrl, handleImageError } from '../utils/imageUrl';
 
 const EnquiryModal = ({ isOpen, onClose, product = null }) => {
   const { showToast } = useToast();
@@ -246,14 +247,20 @@ const EnquiryModal = ({ isOpen, onClose, product = null }) => {
             }}
           >
             <img
-              src={product.thumbnail || (product.images && product.images[0]) || '/logo-icon.svg'}
+              src={getProductImageUrl(product, { width: 112, quality: 75, isThumbnail: true })}
               alt={product.name}
+              width="56"
+              height="56"
+              loading="lazy"
+              decoding="async"
+              onError={handleImageError}
               style={{
                 width: '56px',
                 height: '56px',
                 objectFit: 'cover',
                 borderRadius: '4px',
-                border: '1px solid var(--border-hairline, #ECE7DE)'
+                border: '1px solid var(--border-hairline, #ECE7DE)',
+                aspectRatio: '1 / 1'
               }}
             />
             <div style={{ flex: 1, minWidth: 0 }}>

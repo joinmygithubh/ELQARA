@@ -4,6 +4,7 @@ import { Package, User, MapPin, LogOut, ChevronRight, Clock, ShieldCheck } from 
 import { useAuth } from '../context/AuthContext';
 import { useCurrency } from '../context/CurrencyContext';
 import { orderAPI } from '../services/api';
+import { getOptimizedImageUrl, handleImageError } from '../utils/imageUrl';
 
 const AccountPage = () => {
   const { user, isAuthenticated, logout } = useAuth();
@@ -234,9 +235,14 @@ const AccountPage = () => {
                           {ord.items?.map((item, idx) => (
                             <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                               <img
-                                src={item.image || '/logo-icon.svg'}
+                                src={getOptimizedImageUrl(item.image, { width: 96, quality: 75, isThumbnail: true })}
                                 alt={item.name}
-                                style={{ width: '48px', height: '48px', objectFit: 'cover', borderRadius: '2px', backgroundColor: '#F8F5F0' }}
+                                width="48"
+                                height="48"
+                                loading="lazy"
+                                decoding="async"
+                                onError={handleImageError}
+                                style={{ width: '48px', height: '48px', objectFit: 'cover', borderRadius: '2px', backgroundColor: '#F8F5F0', aspectRatio: '1 / 1' }}
                               />
                               <div style={{ flex: 1 }}>
                                 <div style={{ fontSize: '0.92rem', fontWeight: 500, color: 'var(--text-main)' }}>

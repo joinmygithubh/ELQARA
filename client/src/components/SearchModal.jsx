@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Search, X, Loader2, ArrowRight } from 'lucide-react';
 import { productAPI } from '../services/api';
 import { useCurrency } from '../context/CurrencyContext';
+import { getProductImageUrl, handleImageError } from '../utils/imageUrl';
 
 const SearchModal = ({ isOpen, onClose }) => {
   const [query, setQuery] = useState('');
@@ -169,9 +170,14 @@ const SearchModal = ({ isOpen, onClose }) => {
                     onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
                   >
                     <img
-                      src={product.thumbnail || '/logo-icon.svg'}
+                      src={getProductImageUrl(product, { width: 96, quality: 75, isThumbnail: true })}
                       alt={product.name}
-                      style={{ width: '48px', height: '48px', objectFit: 'cover', borderRadius: '2px', backgroundColor: '#EDE6DD' }}
+                      width="48"
+                      height="48"
+                      loading="lazy"
+                      decoding="async"
+                      onError={handleImageError}
+                      style={{ width: '48px', height: '48px', objectFit: 'cover', borderRadius: '2px', backgroundColor: '#EDE6DD', aspectRatio: '1 / 1' }}
                     />
                     <div style={{ flex: 1 }}>
                       <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.05rem', color: 'var(--text-main)' }}>

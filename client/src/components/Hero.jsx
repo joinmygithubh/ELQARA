@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
-import heroBannerImg from '../assets/images/hero-banner.png';
-import slide2Img from '../assets/images/slider-1.png';
-import slide3Img from '../assets/images/slider-2.png';
+import heroBannerImg from '../assets/images/hero-banner.webp';
+import slide2Img from '../assets/images/slider-1.webp';
+import slide3Img from '../assets/images/slider-2.webp';
 
 const Hero = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -57,7 +57,7 @@ const Hero = () => {
           willChange: 'transform'
         }}
       >
-        {/* Slide 1: Exact Existing First Image & Text Overlay */}
+        {/* Slide 1: Primary Above-The-Fold Hero Image (Highest Priority LCP) */}
         <div style={{ flex: '0 0 100%', width: '100%', minWidth: '100%', position: 'relative' }}>
           <div className="hero-banner-section">
             <img
@@ -65,6 +65,10 @@ const Hero = () => {
               alt="ELQARA - Objects for Living - Timeless Decor for Modern Spaces"
               className="hero-banner-bg"
               loading="eager"
+              fetchPriority="high"
+              decoding="async"
+              width="1600"
+              height="800"
             />
             <div className="hero-banner-overlay" />
             <div className="container hero-banner-container">
@@ -92,7 +96,7 @@ const Hero = () => {
           </div>
         </div>
 
-        {/* Slide 2: Newly Uploaded Photo 1 (Clean photo only - no text, captions, buttons, or overlays) */}
+        {/* Slide 2: Clean photo only */}
         <div style={{ flex: '0 0 100%', width: '100%', minWidth: '100%', position: 'relative' }}>
           <div className="hero-banner-section" style={{ padding: 0 }}>
             <img
@@ -100,12 +104,15 @@ const Hero = () => {
               alt="ELQARA Handcrafted Travertine Table Lamp"
               className="hero-banner-bg"
               loading="lazy"
+              decoding="async"
+              width="1600"
+              height="800"
               style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }}
             />
           </div>
         </div>
 
-        {/* Slide 3: Newly Uploaded Photo 2 (Clean photo only - no text, captions, buttons, or overlays) */}
+        {/* Slide 3: Clean photo only */}
         <div style={{ flex: '0 0 100%', width: '100%', minWidth: '100%', position: 'relative' }}>
           <div className="hero-banner-section" style={{ padding: 0 }}>
             <img
@@ -113,6 +120,9 @@ const Hero = () => {
               alt="ELQARA Handcrafted Fluted Wood Lamp"
               className="hero-banner-bg"
               loading="lazy"
+              decoding="async"
+              width="1600"
+              height="800"
               style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }}
             />
           </div>

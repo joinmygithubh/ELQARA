@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { CheckCircle, Package, ArrowRight, Printer } from 'lucide-react';
 import { orderAPI } from '../services/api';
 import { useCurrency } from '../context/CurrencyContext';
+import { getOptimizedImageUrl, handleImageError } from '../utils/imageUrl';
 
 const OrderSuccessPage = () => {
   const { orderNumber } = useParams();
@@ -130,9 +131,14 @@ const OrderSuccessPage = () => {
               {order.items?.map((item, idx) => (
                 <div key={idx} style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
                   <img
-                    src={item.image || '/logo-icon.svg'}
+                    src={getOptimizedImageUrl(item.image, { width: 120, quality: 75, isThumbnail: true })}
                     alt={item.name}
-                    style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '2px', backgroundColor: '#F8F5F0' }}
+                    width="60"
+                    height="60"
+                    loading="lazy"
+                    decoding="async"
+                    onError={handleImageError}
+                    style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '2px', backgroundColor: '#F8F5F0', aspectRatio: '1 / 1' }}
                   />
                   <div style={{ flex: 1 }}>
                     <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.05rem', color: 'var(--text-main)' }}>

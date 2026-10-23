@@ -5,6 +5,7 @@ import { useWishlist } from '../context/WishlistContext';
 import { useCart } from '../context/CartContext';
 import { useCurrency } from '../context/CurrencyContext';
 import { useAuth } from '../context/AuthContext';
+import { getProductImageUrl, getImageSrcSet, handleImageError } from '../utils/imageUrl';
 
 const WishlistPage = () => {
   const { wishlistItems, removeFromWishlist } = useWishlist();
@@ -70,8 +71,15 @@ const WishlistPage = () => {
               >
                 <div style={{ position: 'relative', aspectRatio: '1 / 1', backgroundColor: '#F8F5F0' }}>
                   <img
-                    src={item.thumbnail || '/logo-icon.svg'}
+                    src={getProductImageUrl(item, { width: 450, quality: 80 })}
+                    srcSet={getImageSrcSet(item.thumbnail || item.images?.[0])}
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 300px"
                     alt={item.name}
+                    width="300"
+                    height="300"
+                    loading="lazy"
+                    decoding="async"
+                    onError={handleImageError}
                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                   />
                   <button

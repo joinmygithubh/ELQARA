@@ -19,6 +19,7 @@ import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useCurrency } from '../context/CurrencyContext';
 import { useAuth } from '../context/AuthContext';
+import { getOptimizedImageUrl, handleImageError } from '../utils/imageUrl';
 import ProductCard from '../components/ProductCard';
 import EnquiryModal from '../components/EnquiryModal';
 
@@ -189,9 +190,13 @@ const ProductDetailPage = () => {
               }}
             >
               <img
-                src={images[activeImage] || images[0]}
+                src={getOptimizedImageUrl(images[activeImage] || images[0], { width: 900, quality: 82 })}
                 alt={product.name}
+                loading="eager"
+                fetchPriority="high"
+                decoding="async"
                 style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                onError={handleImageError}
               />
 
               {product.discount > 0 && (
@@ -221,7 +226,14 @@ const ProductDetailPage = () => {
                     }}
                     aria-label={`Show image ${idx + 1}`}
                   >
-                    <img src={img} alt={`Thumb ${idx}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <img
+                      src={getOptimizedImageUrl(img, { width: 120, isThumbnail: true })}
+                      alt={`Thumb ${idx}`}
+                      loading="lazy"
+                      decoding="async"
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      onError={handleImageError}
+                    />
                   </button>
                 ))}
               </div>

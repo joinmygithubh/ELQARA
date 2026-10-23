@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, Layers, AlertCircle, X, Check } from 'lucide-react';
 import { categoryAPI } from '../../services/api';
 import { useToast } from '../../context/ToastContext';
+import { getOptimizedImageUrl, handleImageError } from '../../utils/imageUrl';
 
 const AdminCategories = () => {
   const [categories, setCategories] = useState([]);
@@ -151,9 +152,14 @@ const AdminCategories = () => {
                 <tr key={c._id}>
                   <td>
                     <img
-                      src={c.image || '/uploads/prod-mushroom-wood.jpg'}
+                      src={getOptimizedImageUrl(c.image || '/uploads/prod-mushroom-wood.jpg', { width: 84, quality: 75, isThumbnail: true })}
                       alt={c.name}
-                      style={{ width: '42px', height: '42px', objectFit: 'cover', borderRadius: '2px', backgroundColor: '#F8F5F0' }}
+                      width="42"
+                      height="42"
+                      loading="lazy"
+                      decoding="async"
+                      onError={handleImageError}
+                      style={{ width: '42px', height: '42px', objectFit: 'cover', borderRadius: '2px', backgroundColor: '#F8F5F0', aspectRatio: '1 / 1' }}
                     />
                   </td>
                   <td style={{ fontWeight: 600, fontFamily: 'var(--font-serif)', fontSize: '1.05rem' }}>

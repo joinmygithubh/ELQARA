@@ -6,8 +6,9 @@ import { useWishlist } from '../context/WishlistContext';
 import { useCurrency } from '../context/CurrencyContext';
 import { useAuth } from '../context/AuthContext';
 import EnquiryModal from './EnquiryModal';
+import { getProductImageUrl, getImageSrcSet, handleImageError } from '../utils/imageUrl';
 
-const ProductCard = ({ product, onQuickView }) => {
+const ProductCard = ({ product, priority = false, onQuickView }) => {
   const { addToCart } = useCart();
   const { isInWishlist, toggleWishlist } = useWishlist();
   const { formatPrice } = useCurrency();
@@ -18,16 +19,26 @@ const ProductCard = ({ product, onQuickView }) => {
 
   const isFavorited = isInWishlist(product._id);
   const isOutOfStock = product.stock <= 0;
+  const imageUrl = getProductImageUrl(product, { width: 450, isThumbnail: true });
+  const srcSet = getImageSrcSet(product.thumbnail || (product.images && product.images[0]), [360, 640]);
 
   return (
     <article className="product-card">
       <div className="product-img-wrapper">
         <Link to={`/product/${product.slug}`} aria-label={`View ${product.name}`}>
           <img
-            src={product.thumbnail || (product.images && product.images[0]) || '/logo-icon.svg'}
+            src={imageUrl}
+            srcSet={srcSet}
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 360px"
             alt={product.name}
             className="product-img"
-            loading="lazy"
+            loading={priority ? 'eager' : 'lazy'}
+            fetchPriority={priority ? 'high' : 'auto'}
+            decoding="async"
+            width="400"
+            height="400"
+            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+            onError={handleImageError}
           />
         </Link>
 

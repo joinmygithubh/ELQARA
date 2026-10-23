@@ -95,7 +95,12 @@ try {
     const localDir = path.dirname(fileURLToPath(import.meta.url));
     const localUploadsPath = path.join(localDir, 'uploads');
     if (fs.existsSync(localUploadsPath)) {
-      app.use('/uploads', express.static(localUploadsPath));
+      app.use('/uploads', express.static(localUploadsPath, {
+        maxAge: '7d',
+        setHeaders: (res) => {
+          res.setHeader('Cache-Control', 'public, max-age=604800, stale-while-revalidate=86400');
+        }
+      }));
     }
   }
 } catch (e) {

@@ -7,6 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { useCurrency } from '../context/CurrencyContext';
 import { orderAPI } from '../services/api';
+import { getOptimizedImageUrl, handleImageError } from '../utils/imageUrl';
 
 const CheckoutPage = () => {
   const {
@@ -567,9 +568,14 @@ const CheckoutPage = () => {
                 {cartItems.map((item) => (
                   <div key={item.product} style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
                     <img
-                      src={item.image || '/logo-icon.svg'}
+                      src={getOptimizedImageUrl(item.image, { width: 112, quality: 75, isThumbnail: true })}
                       alt={item.name}
-                      style={{ width: '56px', height: '56px', objectFit: 'cover', borderRadius: '2px', backgroundColor: '#F5F2EB' }}
+                      width="56"
+                      height="56"
+                      loading="lazy"
+                      decoding="async"
+                      onError={handleImageError}
+                      style={{ width: '56px', height: '56px', objectFit: 'cover', borderRadius: '2px', backgroundColor: '#F5F2EB', aspectRatio: '1 / 1' }}
                     />
                     <div style={{ flex: 1 }}>
                       <div style={{ fontFamily: 'var(--font-serif)', fontSize: '0.95rem', color: 'var(--text-main)', lineHeight: 1.25 }}>

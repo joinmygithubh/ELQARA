@@ -85,6 +85,7 @@ jobs:
           node --check server.js
           node --check app.js
           node test_login_gated_and_shimmer.mjs
+          node test_image_optimization.mjs
 
       # Step 4: Archive frontend build artifact for deploy job
       - name: Upload Frontend Artifact

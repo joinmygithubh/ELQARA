@@ -5,6 +5,7 @@ import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useCurrency } from '../context/CurrencyContext';
 import { useAuth } from '../context/AuthContext';
+import { getOptimizedImageUrl, handleImageError } from '../utils/imageUrl';
 
 const QuickViewModal = ({ product, isOpen, onClose }) => {
   const { addToCart } = useCart();
@@ -84,11 +85,16 @@ const QuickViewModal = ({ product, isOpen, onClose }) => {
         </button>
 
         {/* Left: Gallery */}
-        <div style={{ backgroundColor: '#FAF7F2', padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ backgroundColor: '#FAF7F2', padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center', justifyContent: 'center', minHeight: '380px' }}>
           <img
-            src={images[selectedImage] || images[0]}
+            src={getOptimizedImageUrl(images[selectedImage] || images[0], { width: 600, quality: 80 })}
             alt={product.name}
-            style={{ width: '100%', maxHeight: '380px', objectFit: 'contain' }}
+            width="380"
+            height="380"
+            loading="eager"
+            decoding="async"
+            onError={handleImageError}
+            style={{ width: '100%', maxHeight: '380px', objectFit: 'contain', aspectRatio: '1 / 1' }}
           />
           {images.length > 1 && (
             <div style={{ display: 'flex', gap: '0.6rem' }}>
@@ -106,7 +112,16 @@ const QuickViewModal = ({ product, isOpen, onClose }) => {
                     backgroundColor: '#FFF'
                   }}
                 >
-                  <img src={img} alt={`Thumb ${i}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <img
+                    src={getOptimizedImageUrl(img, { width: 108, quality: 75, isThumbnail: true })}
+                    alt={`Thumb ${i}`}
+                    width="54"
+                    height="54"
+                    loading="lazy"
+                    decoding="async"
+                    onError={handleImageError}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
                 </button>
               ))}
             </div>
